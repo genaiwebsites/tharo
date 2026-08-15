@@ -8,6 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import TheThread from '@/components/common/TheThread';
+
 import HeroThreshold from '@/components/sections/HeroThreshold';
 import TheNameMeaning from '@/components/sections/TheNameMeaning';
 import BlueRoom from '@/components/sections/BlueRoom';
@@ -94,30 +95,35 @@ export default function Home() {
       );
     };
 
+    let ticking = false;
     const onScroll = () => {
-      const thresholdEl = document.getElementById('threshold');
-      const meaningEl = document.getElementById('meaning');
-      const vh = window.innerHeight;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const thresholdEl = document.getElementById('threshold');
+          const vh = window.innerHeight;
 
-      if (thresholdEl && meaningEl) {
-        const heroEnd = thresholdEl.offsetTop + thresholdEl.offsetHeight;
-        const totalHeight = document.documentElement.scrollHeight - vh;
-        
-        // Only start threadline once Beat 3 "Book a fitting" button is scrolled and hero completes
-        const hasPassedHero = window.scrollY >= heroEnd - 10;
-        setIsHeroPassed(hasPassedHero);
+          if (thresholdEl) {
+            const heroEnd = thresholdEl.offsetTop + thresholdEl.offsetHeight;
+            const totalHeight = document.documentElement.scrollHeight - vh;
 
-        if (hasPassedHero) {
-          const remainingSpan = Math.max(1, totalHeight - heroEnd);
-          const relativeScroll = Math.max(0, window.scrollY - heroEnd);
-          const tProg = Math.min(1, Math.max(0, relativeScroll / remainingSpan));
-          setThreadProgress(tProg);
-        } else {
-          setThreadProgress(0);
-        }
+            const hasPassedHero = window.scrollY >= heroEnd - 10;
+            setIsHeroPassed((prev) => (prev !== hasPassedHero ? hasPassedHero : prev));
+
+            if (hasPassedHero) {
+              const remainingSpan = Math.max(1, totalHeight - heroEnd);
+              const relativeScroll = Math.max(0, window.scrollY - heroEnd);
+              const tProg = Math.min(1, Math.max(0, relativeScroll / remainingSpan));
+              setThreadProgress((prev) => (Math.abs(prev - tProg) > 0.001 ? tProg : prev));
+            } else {
+              setThreadProgress((prev) => (prev !== 0 ? 0 : prev));
+            }
+          }
+
+          applyTemperature();
+          ticking = false;
+        });
+        ticking = true;
       }
-
-      applyTemperature();
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -204,7 +210,7 @@ export default function Home() {
         lineHeight: 1.65,
         letterSpacing: '0.005em',
         overflowX: 'clip',
-        transition: 'background 600ms cubic-bezier(0.16, 1, 0.3, 1)'
+        transition: 'background 600ms cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       <Header />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { CHAPTERS } from '@/lib/constants';
 
 interface TheThreadProps {
@@ -14,16 +14,13 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activePathRef = useRef<SVGPathElement>(null);
   const shadowPathRef = useRef<SVGPathElement>(null);
+  const clipRectRef = useRef<SVGRectElement>(null);
+  const needleGroupRef = useRef<SVGGElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const badgeRomanRef = useRef<HTMLSpanElement>(null);
+  const badgeLabelRef = useRef<HTMLSpanElement>(null);
 
-  const [activeChapterIndex, setActiveChapterIndex] = useState<number>(0);
-  const [currentY, setCurrentY] = useState<number>(20);
-  const [needlePos, setNeedlePos] = useState<{ x: number; y: number; angle: number }>({
-    x: 36,
-    y: 20,
-    angle: 90,
-  });
-
-  const [knots, setKnots] = useState<
+  const knotsRef = useRef<
     Array<{
       id: string;
       label: string;
@@ -31,7 +28,8 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       y: number;
       x: number;
       fraction: number;
-      active: boolean;
+      eyeletOuter: SVGCircleElement | null;
+      eyeletInner: SVGCircleElement | null;
     }>
   >([]);
 
@@ -54,8 +52,11 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
     return { x, y, angle };
   };
 
-  const [dCord, setDCord] = useState<string>('');
-  const [dCouching, setDCouching] = useState<string>('');
+  const [dCord, setDCord] = React.useState<string>('');
+  const [dCouching, setDCouching] = React.useState<string>('');
+  const [chapterList, setChapterList] = React.useState<
+    Array<{ id: string; label: string; roman: string; x: number; y: number }>
+  >([]);
 
   useEffect(() => {
     const buildGeometry = () => {
@@ -119,11 +120,13 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
           y: knotY,
           x: pt.x,
           fraction,
-          active: idx === 0,
+          eyeletOuter: null,
+          eyeletInner: null,
         };
       });
 
-      setKnots(calculatedKnots);
+      knotsRef.current = calculatedKnots;
+      setChapterList(calculatedKnots.map((k) => ({ id: k.id, label: k.label, roman: k.roman, x: k.x, y: k.y })));
       setDCord(cordStr);
       setDCouching(couchingStr);
     };
@@ -133,7 +136,7 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
     return () => window.removeEventListener('resize', buildGeometry);
   }, [geometry]);
 
-  // Synchronize scroll progress without CSS lag
+  // Synchronize scroll progress directly on DOM refs with zero React re-render churn
   useEffect(() => {
     if (!visible) return;
 
@@ -143,16 +146,21 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
     const usableSpan = bottomY - topY;
 
     const clampedProg = Math.min(1, Math.max(0, scrollProgress));
-    // When clampedProg = 1.0, yPos reaches bottomY cleanly
     const yPos = topY + clampedProg * usableSpan;
     const pt = getPointAtY(yPos);
 
-    setCurrentY(yPos);
-    setNeedlePos(pt);
+    if (clipRectRef.current) {
+      clipRectRef.current.setAttribute('height', `${Math.max(0, yPos + 2)}`);
+    }
 
-    // Direct pathLength offset calculation: goes from 1000 (at prog=0) to 0 (at prog=1.0)
+    if (needleGroupRef.current) {
+      needleGroupRef.current.setAttribute(
+        'transform',
+        `translate(${pt.x.toFixed(1)}, ${pt.y.toFixed(1)}) rotate(${pt.angle.toFixed(1)})`
+      );
+    }
+
     const offset = 1000 * (1 - clampedProg);
-
     if (activePathRef.current) {
       activePathRef.current.style.strokeDashoffset = `${offset.toFixed(1)}`;
     }
@@ -160,20 +168,28 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       shadowPathRef.current.style.strokeDashoffset = `${offset.toFixed(1)}`;
     }
 
-    // Determine active chapter knot
-    let activeIdx = 0;
-    setKnots((prev) =>
-      prev.map((k, idx) => {
-        const isActive = clampedProg >= k.fraction - 0.02;
-        if (isActive) activeIdx = idx;
-        return { ...k, active: isActive };
-      })
-    );
+    // Update chapter knots directly
+    let activeKnot = knotsRef.current[0];
+    knotsRef.current.forEach((k) => {
+      const isActive = clampedProg >= k.fraction - 0.02;
+      if (isActive) activeKnot = k;
 
-    setActiveChapterIndex(activeIdx);
+      if (k.eyeletOuter) {
+        k.eyeletOuter.style.opacity = isActive ? '0.95' : '0';
+        k.eyeletOuter.setAttribute('r', isActive ? '5' : '3');
+      }
+      if (k.eyeletInner) {
+        k.eyeletInner.style.opacity = isActive ? '1' : '0';
+        k.eyeletInner.setAttribute('r', isActive ? '2' : '1');
+      }
+    });
+
+    if (badgeRef.current && activeKnot) {
+      badgeRef.current.style.top = `${activeKnot.y.toFixed(1)}px`;
+      if (badgeRomanRef.current) badgeRomanRef.current.textContent = activeKnot.roman;
+      if (badgeLabelRef.current) badgeLabelRef.current.textContent = activeKnot.label;
+    }
   }, [scrollProgress, visible]);
-
-  const activeChapter = activeChapterIndex >= 0 ? knots[activeChapterIndex] : null;
 
   return (
     <aside
@@ -235,7 +251,7 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
 
           {/* Strict ClipPath: Ensures EVERYTHING only exists up to current needle Y */}
           <clipPath id="thread-scrolled-clip">
-            <rect x="0" y="0" width="100" height={Math.max(0, currentY + 2)} />
+            <rect ref={clipRectRef} x="0" y="0" width="100" height="24" />
           </clipPath>
         </defs>
 
@@ -286,18 +302,21 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
         </g>
 
         {/* 4. Chapter Tension Eyelets */}
-        {knots.map((k) => (
+        {chapterList.map((k, idx) => (
           <g key={k.id} className="chapter-eyelet">
             {/* Outer Ring */}
             <circle
+              ref={(el) => {
+                if (knotsRef.current[idx]) knotsRef.current[idx].eyeletOuter = el;
+              }}
               cx={k.x.toFixed(1)}
               cy={k.y.toFixed(1)}
-              r={k.active ? '5' : '3'}
+              r="3"
               fill="none"
-              stroke={k.active ? '#ffffff' : '#6f7588'}
-              strokeWidth={k.active ? '1.2' : '0.8'}
-              opacity={k.active ? 0.95 : 0}
-              filter={k.active ? 'url(#soft-thread-glow)' : 'none'}
+              stroke="#ffffff"
+              strokeWidth="1.2"
+              opacity="0"
+              filter="url(#soft-thread-glow)"
               style={{
                 transition:
                   'r 300ms cubic-bezier(0.16, 1, 0.3, 1), stroke 300ms ease, opacity 300ms ease',
@@ -307,107 +326,111 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
 
             {/* Inner Core Knot */}
             <circle
+              ref={(el) => {
+                if (knotsRef.current[idx]) knotsRef.current[idx].eyeletInner = el;
+              }}
               cx={k.x.toFixed(1)}
               cy={k.y.toFixed(1)}
-              r={k.active ? '2' : '1'}
-              fill={k.active ? '#ffffff' : '#8a90a2'}
-              opacity={k.active ? 1 : 0}
+              r="1"
+              fill="#ffffff"
+              opacity="0"
               style={{ transition: 'r 250ms ease, fill 250ms ease, opacity 250ms ease' }}
             />
           </g>
         ))}
 
         {/* 5. Sleek Bespoke Tailor's Sewing Needle at Current Scroll Tip */}
-        {visible && (
-          <g
-            transform={`translate(${needlePos.x.toFixed(1)}, ${needlePos.y.toFixed(1)}) rotate(${needlePos.angle.toFixed(1)})`}
-            opacity="1"
-          >
-            {/* Subtle Needle Ambient Halo */}
-            <circle r="8" fill="#ffffff" opacity="0.12" filter="url(#needle-starlight-glow)" />
+        <g
+          ref={needleGroupRef}
+          transform="translate(36, 24) rotate(90)"
+          opacity={visible ? 1 : 0}
+        >
+          {/* Subtle Needle Ambient Halo */}
+          <circle r="8" fill="#ffffff" opacity="0.12" filter="url(#needle-starlight-glow)" />
 
-            {/* Slender Needle Blade */}
-            <path
-              d="M 0 -11 L 1.6 -2 L 0.8 9 L 0 13 L -0.8 9 L -1.6 -2 Z"
-              fill="url(#needle-gradient)"
-              stroke="#ffffff"
-              strokeWidth="0.4"
-              filter="url(#needle-starlight-glow)"
-            />
+          {/* Slender Needle Blade */}
+          <path
+            d="M 0 -11 L 1.6 -2 L 0.8 9 L 0 13 L -0.8 9 L -1.6 -2 Z"
+            fill="url(#needle-gradient)"
+            stroke="#ffffff"
+            strokeWidth="0.4"
+            filter="url(#needle-starlight-glow)"
+          />
 
-            {/* Needle Eyelet */}
-            <ellipse cx="0" cy="-5" rx="0.55" ry="1.6" fill="#0b0f18" />
-            <circle cx="0" cy="-5" r="0.45" fill="#ffffff" />
+          {/* Needle Eyelet */}
+          <ellipse cx="0" cy="-5" rx="0.55" ry="1.6" fill="#0b0f18" />
+          <circle cx="0" cy="-5" r="0.45" fill="#ffffff" />
 
-            {/* Trailing Active Starlight Stitch */}
-            <circle cx="0" cy="13" r="1.3" fill="#ffffff" filter="url(#soft-thread-glow)" />
-          </g>
-        )}
+          {/* Trailing Active Starlight Stitch */}
+          <circle cx="0" cy="13" r="1.3" fill="#ffffff" filter="url(#soft-thread-glow)" />
+        </g>
       </svg>
 
       {/* 6. Floating Chapter Indicator Badge */}
-      {visible && activeChapter && (
+      <div
+        ref={badgeRef}
+        style={{
+          position: 'absolute',
+          left: '48px',
+          top: '24px',
+          transform: 'translateY(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '5px 12px',
+          borderRadius: '4px',
+          background: 'rgba(11, 15, 24, 0.94)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(207, 211, 229, 0.24)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.65), 0 0 12px rgba(207, 211, 229, 0.08)',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'auto',
+          opacity: visible ? 1 : 0,
+          transition: 'opacity 300ms ease',
+        }}
+      >
+        {/* Connecting Hairline Lead from Knot */}
         <div
           style={{
             position: 'absolute',
-            left: '48px',
-            top: `${activeChapter.y.toFixed(1)}px`,
-            transform: 'translateY(-50%)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '5px 12px',
-            borderRadius: '4px',
-            background: 'rgba(11, 15, 24, 0.94)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(207, 211, 229, 0.24)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.65), 0 0 12px rgba(207, 211, 229, 0.08)',
-            whiteSpace: 'nowrap',
-            pointerEvents: 'auto',
-            animation: 'th-fade 250ms cubic-bezier(0.16, 1, 0.3, 1) both',
+            left: '-8px',
+            top: '50%',
+            width: '8px',
+            height: '1px',
+            background: 'linear-gradient(90deg, rgba(207, 211, 229, 0.5), rgba(207, 211, 229, 0.1))',
+          }}
+        />
+
+        {/* Roman Numeral */}
+        <span
+          ref={badgeRomanRef}
+          style={{
+            fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
+            fontSize: '12px',
+            fontStyle: 'italic',
+            color: '#cfd3e5',
+            borderRight: '1px solid rgba(207, 211, 229, 0.22)',
+            paddingRight: '6px',
           }}
         >
-          {/* Connecting Hairline Lead from Knot */}
-          <div
-            style={{
-              position: 'absolute',
-              left: '-8px',
-              top: '50%',
-              width: '8px',
-              height: '1px',
-              background: 'linear-gradient(90deg, rgba(207, 211, 229, 0.5), rgba(207, 211, 229, 0.1))',
-            }}
-          />
+          I
+        </span>
 
-          {/* Roman Numeral */}
-          <span
-            style={{
-              fontFamily: 'var(--font-newsreader), Georgia, serif',
-              fontSize: '11px',
-              fontStyle: 'italic',
-              color: '#cfd3e5',
-              borderRight: '1px solid rgba(207, 211, 229, 0.22)',
-              paddingRight: '6px',
-            }}
-          >
-            {activeChapter.roman}
-          </span>
-
-          {/* Chapter Title */}
-          <span
-            style={{
-              fontSize: '9px',
-              fontWeight: 500,
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: '#f3f5fe',
-            }}
-          >
-            {activeChapter.label}
-          </span>
-        </div>
-      )}
+        {/* Chapter Title */}
+        <span
+          ref={badgeLabelRef}
+          style={{
+            fontSize: '9px',
+            fontWeight: 500,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#f3f5fe',
+          }}
+        >
+          THE THRESHOLD
+        </span>
+      </div>
     </aside>
   );
 }

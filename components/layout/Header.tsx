@@ -57,10 +57,10 @@ export default function Header() {
       <Link
         href="#threshold"
         style={{
-          fontFamily: 'var(--font-newsreader), Georgia, serif',
-          fontSize: '19px',
+          fontFamily: 'var(--font-cinzel), var(--font-cormorant), Georgia, serif',
+          fontSize: '18px',
           letterSpacing: '0.42em',
-          fontWeight: 400,
+          fontWeight: 500,
           color: '#e9e9ed',
           paddingRight: '6px'
         }}

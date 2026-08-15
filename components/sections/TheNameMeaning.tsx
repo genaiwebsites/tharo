@@ -40,7 +40,8 @@ export default function TheNameMeaning() {
               <p
                 style={{
                   margin: 0,
-                  fontFamily: 'var(--font-tiro-hindi), serif',
+                  fontFamily: 'var(--font-noto-devanagari), sans-serif',
+                  fontWeight: 600,
                   fontSize: 'clamp(30px, 4.4vw, 54px)',
                   lineHeight: 1.25,
                   color: '#f3f5fe'
@@ -51,8 +52,8 @@ export default function TheNameMeaning() {
               <p
                 style={{
                   margin: 0,
-                  fontFamily: 'var(--font-newsreader), Georgia, serif',
-                  fontWeight: 300,
+                  fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
+                  fontWeight: 400,
                   fontSize: 'clamp(30px, 4.4vw, 54px)',
                   lineHeight: 1.25,
                   color: '#cfd3e5',
@@ -64,8 +65,8 @@ export default function TheNameMeaning() {
               <p
                 style={{
                   margin: 0,
-                  fontFamily: 'var(--font-newsreader), Georgia, serif',
-                  fontWeight: 300,
+                  fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
+                  fontWeight: 400,
                   fontSize: 'clamp(30px, 4.4vw, 54px)',
                   lineHeight: 1.25,
                   color: '#75798c'

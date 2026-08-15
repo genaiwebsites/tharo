@@ -68,8 +68,8 @@ export default function ClientDiaries() {
             style={{
               margin: 0,
               maxWidth: '18ch',
-              fontFamily: 'var(--font-newsreader), Georgia, serif',
-              fontWeight: 300,
+              fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
+              fontWeight: 400,
               fontSize: 'clamp(32px, 4.4vw, 58px)',
               lineHeight: 1.08,
               color: '#f3f5fe',
@@ -82,9 +82,9 @@ export default function ClientDiaries() {
         <p
           style={{
             margin: 0,
-            fontFamily: 'var(--font-newsreader), Georgia, serif',
+            fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
             fontStyle: 'italic',
-            fontWeight: 300,
+            fontWeight: 400,
             fontSize: 'clamp(17px, 1.7vw, 21px)',
             lineHeight: 1.5,
             color: '#a3968a',

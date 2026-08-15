@@ -123,8 +123,8 @@ export default function TheRail() {
           <h2
             style={{
               margin: 0,
-              fontFamily: 'var(--font-newsreader), Georgia, serif',
-              fontWeight: 300,
+              fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
+              fontWeight: 400,
               fontSize: 'clamp(28px, 3.6vw, 48px)',
               lineHeight: 1.1,
               color: '#f3f5fe'

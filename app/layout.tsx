@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter_Tight, Newsreader, Tiro_Devanagari_Hindi } from 'next/font/google';
+import { Inter_Tight, Cormorant_Garamond, Noto_Sans_Devanagari, Cinzel } from 'next/font/google';
 import './globals.css';
 
 const interTight = Inter_Tight({
@@ -9,18 +9,25 @@ const interTight = Inter_Tight({
   display: 'swap',
 });
 
-const newsreader = Newsreader({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   style: ['normal', 'italic'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-newsreader',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-cormorant',
   display: 'swap',
 });
 
-const tiroHindi = Tiro_Devanagari_Hindi({
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cinzel',
+  display: 'swap',
+});
+
+const notoSansDevanagari = Noto_Sans_Devanagari({
   subsets: ['devanagari', 'latin'],
-  weight: ['400'],
-  variable: '--font-tiro-hindi',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-noto-devanagari',
   display: 'swap',
 });
 
@@ -104,7 +111,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${interTight.variable} ${newsreader.variable} ${tiroHindi.variable}`}>
+    <html lang="en" className={`${interTight.variable} ${cormorant.variable} ${cinzel.variable} ${notoSansDevanagari.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -112,7 +119,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* Subtle Luxury Overlays: Organic Grain and Dot Matrix */}
+        {/* Subtle Luxury Overlays */}
         <div
           aria-hidden="true"
           style={{

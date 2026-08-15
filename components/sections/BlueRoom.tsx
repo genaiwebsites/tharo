@@ -40,8 +40,8 @@ export default function BlueRoom() {
               style={{
                 margin: 0,
                 maxWidth: '16ch',
-                fontFamily: 'var(--font-newsreader), Georgia, serif',
-                fontWeight: 300,
+                fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
+                fontWeight: 400,
                 fontSize: 'clamp(34px, 5vw, 68px)',
                 lineHeight: 1.06,
                 letterSpacing: '-0.01em',
@@ -196,9 +196,9 @@ export default function BlueRoom() {
             <p
               style={{
                 margin: 0,
-                fontFamily: 'var(--font-newsreader), Georgia, serif',
+                fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
                 fontStyle: 'italic',
-                fontWeight: 300,
+                fontWeight: 400,
                 fontSize: 'clamp(20px, 2.1vw, 27px)',
                 lineHeight: 1.4,
                 color: '#cfd3e5',

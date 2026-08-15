@@ -250,34 +250,40 @@ Dithering reads *techno-brutalist*, and used decoratively it will fight this bra
 
 ---
 
-## 8. Typography
+## 8. Typography & Font Pairing System
 
-Their logotype is a wide-tracked serif with a distinctive O. **Extend it, don't fight it.**
+The website implements a cohesive, high-fashion 3-tier typographic system:
 
-| Role | Choice | Notes |
-|---|---|---|
-| Display | **Canela**, **Ogg**, **Reckless Neue**, **GT Alpina**, or **Editorial New** | If licensing forces an open-source substitute, use **Instrument Serif** or **Newsreader** — never Playfair, Cormorant, or Italiana |
-| Body | **Söhne**, **ABC Diatype**, or **Neue Haas Grotesk** | Open-source substitute: **Inter Tight** at generous tracking, or **Geist** |
-| Devanagari companion | Any well-drawn Devanagari face | For *Khamma Ghani* and Marwari phrasing. **This is where the brand's origin becomes visible instead of merely stated.** |
-
-**Variable font motion:** interpolate optical size and weight on scroll for the hero headline. Almost nobody does this, and it feels engineered rather than decorated.
-
-**Scale:** Establish a clear ratio. Display sizes should be genuinely large — hero wordmark at `clamp(4rem, 14vw, 12rem)`. Body at 16–18px with 1.6–1.7 line-height and slightly open tracking.
+| Role | Font Family | Source & Weights | Usage Context |
+|---|---|---|---|
+| **Headings & Display** | **`Cormorant Garamond`** (`var(--font-cormorant)`) | Google Fonts (300, 400, 500, 600, 700) | All section titles (h1, h2, h3), editorial display quotes, and occasion cards. Characterized by high optical contrast, razor-sharp delicate serifs, and haute couture editorial rhythm. |
+| **Brand Monograph & Badges** | **`Cinzel`** (`var(--font-cinzel)`) | Google Fonts (400, 500, 600, 700) | Brand wordmark **THARO**, Roman chapter milestones, and technical stage badges. |
+| **Devanagari Cultural Calligraphy** | **`Noto Sans Devanagari`** (`var(--font-noto-devanagari)`) | Google Fonts (400, 500, 600, 700) | Cultural greetings (*खम्मा घणी*), Marwari etymology (*थारो*), and heritage seals. Styled with custom 3D metallic gold shader sweep. |
+| **Body & Editorial Architecture** | **`Inter Tight`** (`var(--font-inter-tight)`) | Google Fonts (300, 400, 500, 600) | Paragraph copy, technical tailoring specs, form inputs, timecode clocks, and UI buttons. |
 
 ---
 
-## 9. Colour
+## 9. Colour & Metallic 3D Shaders
 
-Derive everything from their actual photography. Four to six tokens, driven by the global light-temperature variable.
+Derive everything from real high-fashion editorial photography and bespoke metalwork:
 
+```css
+--bg-primary: #0b0f18;      /* Deep midnight navy, Blue Room wainscot */
+--bg-panel: #131b29;        /* Cool panel blue */
+--bg-warm: #171412;         /* Limewash warm room */
+--bg-warm-panel: #28211c;   /* Terracotta niche */
+--fg-primary: #f3f5fe;      /* High-contrast off-white */
+--fg-muted: #9397ab;        /* Cool slate text */
+--fg-dim: #5f6472;          /* Subtle metadata */
+--accent-cool: #cfd3e5;     /* Silver cornelli stitch */
+--accent-gold: #c5a880;     /* Antique brass & zardozi gold */
+--accent-terracotta: #b8624d;/* Rajasthani spice accent */
 ```
---ink            deep navy, sampled from the Blue Room wainscot
---ink-deep       near-black navy for text and dark fields
---plaster        the warm off-white of the plinths and limewash
---thread         the silver of the cornelli work — a cool desaturated grey, NOT gold
---oxblood        the maroon dinner jacket — the single accent, used maybe three times total
---haldi          marigold, appears only in the Occasion selector
-```
+
+### 3D Metallic Shimmer Shader Architecture
+- **`.hero-3d-monograph`**: Flowing multi-stop platinum metallic gradient with `@keyframes metallic-sheen` reflection sweep and dual-stage ambient drop shadows.
+- **`.devanagari-3d-metallic`**: Sculpted 3D warm gold gradient with soft specular halo.
+- **Atmospheric Behind-Text Aura**: Organic breathing radial backdrop glow highlighting the brand monograph without interfering with photographic backgrounds.
 
 Note the deliberate absence of gold. Every Indian luxury site reaches for gold. Tharo's actual signature thread is **silver**. That restraint is the differentiator.
 

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { computeStoreStatus } from '@/lib/storeStatus';
 import { StoreStatus } from '@/lib/types';
+import { StorePinIcon, ClockStatusIcon } from '@/components/common/Icons';
 
 export default function Footer() {
   const [status, setStatus] = useState<StoreStatus>(computeStoreStatus());
@@ -19,7 +20,7 @@ export default function Footer() {
       style={{
         position: 'relative',
         padding: 'min(10vh, 80px) 32px 46px clamp(22px, 6.5vw, 92px)',
-        borderTop: '1px solid rgba(233, 233, 237, 0.10)'
+        borderTop: '1px solid rgba(233, 233, 237, 0.10)',
       }}
     >
       <div
@@ -28,17 +29,18 @@ export default function Footer() {
           margin: '0 auto',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 'clamp(28px, 4vw, 64px)'
+          gap: 'clamp(28px, 4vw, 64px)',
         }}
       >
         <div>
           <p
             style={{
               margin: 0,
-              fontFamily: 'var(--font-newsreader), Georgia, serif',
-              fontSize: '17px',
-              letterSpacing: '0.42em',
-              color: '#e9e9ed'
+              fontFamily: 'var(--font-cinzel), var(--font-cormorant), Georgia, serif',
+              fontSize: '18px',
+              letterSpacing: '0.36em',
+              color: '#e9e9ed',
+              fontWeight: 500,
             }}
           >
             THARO
@@ -49,7 +51,7 @@ export default function Footer() {
               fontSize: '10.5px',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
-              color: '#5f6472'
+              color: '#75798c',
             }}
           >
             Designed for you
@@ -60,7 +62,7 @@ export default function Footer() {
               maxWidth: '30ch',
               fontSize: '14.5px',
               lineHeight: 1.7,
-              color: '#75798c'
+              color: '#75798c',
             }}
           >
             Bespoke sherwani, made-to-measure suits and designer shirts in Bhowanipore, Kolkata.
@@ -71,13 +73,17 @@ export default function Footer() {
           <p
             style={{
               margin: '0 0 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
               fontSize: '10.5px',
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color: '#5f6472'
+              color: '#c5a880',
             }}
           >
-            Flagship store
+            <StorePinIcon size={14} color="#c5a880" />
+            <span>Flagship store</span>
           </p>
           <p style={{ margin: 0 }}>
             31 Allenby Road, Bhawanipore
@@ -95,7 +101,8 @@ export default function Footer() {
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
               borderBottom: '1px solid rgba(207, 211, 229, 0.3)',
-              paddingBottom: '3px'
+              paddingBottom: '3px',
+              color: '#cfd3e5',
             }}
           >
             Open in Google Maps
@@ -106,13 +113,17 @@ export default function Footer() {
           <p
             style={{
               margin: '0 0 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
               fontSize: '10.5px',
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color: '#5f6472'
+              color: '#c5a880',
             }}
           >
-            Hours
+            <ClockStatusIcon size={14} color="#c5a880" />
+            <span>Hours</span>
           </p>
           <p style={{ margin: 0 }}>
             11:00 AM – 8:30 PM
@@ -129,17 +140,21 @@ export default function Footer() {
               fontSize: '10.5px',
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color: '#5f6472'
+              color: '#75798c',
             }}
           >
-            Direct
+            Direct Concierge
           </p>
           <p style={{ margin: 0 }}>
             <a
               href="https://wa.me/919062512323?text=Hello%20Tharo%2C%20I%20would%20like%20to%20book%20a%20fitting%20at%20your%20Allenby%20Road%20atelier."
               target="_blank"
               rel="noopener noreferrer"
-              style={{ borderBottom: '1px solid rgba(207, 211, 229, 0.3)', paddingBottom: '3px' }}
+              style={{
+                borderBottom: '1px solid rgba(207, 211, 229, 0.3)',
+                paddingBottom: '3px',
+                color: '#cfd3e5',
+              }}
             >
               WhatsApp (+91 90625 12323)
             </a>
@@ -149,7 +164,11 @@ export default function Footer() {
               href="https://instagram.com/tharo_designedforyou"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ borderBottom: '1px solid rgba(207, 211, 229, 0.3)', paddingBottom: '3px' }}
+              style={{
+                borderBottom: '1px solid rgba(207, 211, 229, 0.3)',
+                paddingBottom: '3px',
+                color: '#cfd3e5',
+              }}
             >
               Instagram @tharo_designedforyou
             </a>
@@ -169,7 +188,7 @@ export default function Footer() {
           flexWrap: 'wrap',
           gap: '16px',
           fontSize: '12px',
-          color: '#5f6472'
+          color: '#5f6472',
         }}
       >
         <p style={{ margin: 0 }}>
