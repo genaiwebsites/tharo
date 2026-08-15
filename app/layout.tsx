@@ -119,32 +119,20 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* Subtle Luxury Overlays */}
+        {/* Silky Smooth Ambient Velvet Caustic Overlay */}
         <div
           aria-hidden="true"
           style={{
             position: 'fixed',
             inset: 0,
-            zIndex: 60,
+            zIndex: 1,
             pointerEvents: 'none',
-            opacity: 0.055,
-            mixBlendMode: 'overlay',
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")`
+            background: 'radial-gradient(120% 80% at 50% 20%, rgba(20, 28, 48, 0.25) 0%, rgba(6, 8, 14, 0.7) 60%, rgba(4, 6, 10, 0.95) 100%)',
           }}
         />
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 59,
-            pointerEvents: 'none',
-            opacity: 0.018,
-            backgroundImage: 'radial-gradient(circle at 1px 1px,#fff 1px,transparent 0)',
-            backgroundSize: '3px 3px'
-          }}
-        />
-        {children}
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          {children}
+        </div>
       </body>
     </html>
   );

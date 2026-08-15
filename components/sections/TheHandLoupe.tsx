@@ -227,45 +227,50 @@ export default function TheHandLoupe() {
         <div
           ref={loupeRef}
           aria-hidden="true"
+          className="optic-lens-frame"
           style={{
             position: 'fixed',
             top: 0,
             left: 0,
-            width: '210px',
-            height: '210px',
-            marginLeft: '-105px',
-            marginTop: '-105px',
+            width: '230px',
+            height: '230px',
+            marginLeft: '-115px',
+            marginTop: '-115px',
             borderRadius: '50%',
             pointerEvents: 'none',
             zIndex: 80,
-            border: '1px solid rgba(207, 211, 229, 0.65)',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.4)',
+            border: '2px solid rgba(229, 189, 113, 0.85)',
+            boxShadow:
+              '0 30px 90px rgba(0, 0, 0, 0.85), inset 0 0 0 1.5px rgba(255, 70, 70, 0.3), inset 0 0 35px rgba(0, 0, 0, 0.6), 0 0 30px rgba(229, 189, 113, 0.25)',
             backgroundRepeat: 'no-repeat',
             opacity: 0,
-            transition: 'opacity 250ms ease',
+            transition: 'opacity 250ms ease, border-color 250ms ease',
             willChange: 'transform, background-position',
           }}
         >
-          {/* Glass Specular & Crosshair */}
+          {/* Glass Specular Convex Reflection */}
           <div
             style={{
               position: 'absolute',
               inset: 0,
               borderRadius: '50%',
               background:
-                'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18) 0%, transparent 60%)',
+                'radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.04) 45%, transparent 70%)',
             }}
           />
+
+          {/* Micro Precision Calibration Reticle */}
           <div
             style={{
               position: 'absolute',
               left: '50%',
               top: '50%',
-              width: '12px',
+              width: '18px',
               height: '1px',
-              background: '#cfd3e5',
+              background: '#e5bd71',
               transform: 'translate(-50%, -50%)',
-              opacity: 0.7,
+              opacity: 0.85,
+              boxShadow: '0 0 4px rgba(229, 189, 113, 0.6)',
             }}
           />
           <div
@@ -274,12 +279,36 @@ export default function TheHandLoupe() {
               left: '50%',
               top: '50%',
               width: '1px',
-              height: '12px',
-              background: '#cfd3e5',
+              height: '18px',
+              background: '#e5bd71',
               transform: 'translate(-50%, -50%)',
-              opacity: 0.7,
+              opacity: 0.85,
+              boxShadow: '0 0 4px rgba(229, 189, 113, 0.6)',
             }}
           />
+
+          {/* Precision Magnification Badge */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '14px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              padding: '3px 8px',
+              borderRadius: '12px',
+              background: 'rgba(11, 15, 24, 0.85)',
+              border: '1px solid rgba(229, 189, 113, 0.5)',
+              fontSize: '8px',
+              fontWeight: 600,
+              letterSpacing: '0.22em',
+              color: '#f3f5fe',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.6)',
+            }}
+          >
+            4.8× Macro
+          </div>
         </div>
       )}
     </>

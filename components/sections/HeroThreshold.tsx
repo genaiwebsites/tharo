@@ -36,8 +36,13 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
       y: (ny - 0.5) * 2,
     });
 
+    const caX = (nx - 0.5) * 4;
+    const caY = (ny - 0.5) * 2;
+
     document.documentElement.style.setProperty('--spec-x', `${x.toFixed(1)}%`);
     document.documentElement.style.setProperty('--spec-y', `${y.toFixed(1)}%`);
+    document.documentElement.style.setProperty('--ca-x', `${caX.toFixed(2)}px`);
+    document.documentElement.style.setProperty('--ca-y', `${caY.toFixed(2)}px`);
   };
 
   useEffect(() => {

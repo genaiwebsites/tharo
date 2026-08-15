@@ -141,16 +141,6 @@ export default function ClientDiaries() {
                   background: 'linear-gradient(180deg, rgba(28, 20, 14, 0.05), rgba(28, 20, 14, 0.42))'
                 }}
               />
-              <div
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  opacity: 0.1,
-                  mixBlendMode: 'overlay',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23g)'/%3E%3C/svg%3E")`
-                }}
-              />
             </div>
             <figcaption style={{ marginTop: '14px' }}>
               <span

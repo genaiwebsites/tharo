@@ -233,7 +233,8 @@ export default function WarmRoomWedding({ onOccasionChange }: WarmRoomWeddingPro
               overflow: 'hidden',
               background: '#2a221c',
               borderRadius: '50% 50% 6px 6px / 33% 33% 1.5% 1.5%',
-              boxShadow: '0 40px 90px rgba(0, 0, 0, 0.45)',
+              border: '1px solid rgba(229, 189, 113, 0.35)',
+              boxShadow: '0 40px 100px rgba(0, 0, 0, 0.75), 0 0 45px rgba(196, 132, 62, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.12)',
             }}
           >
             {OCCASIONS.map((o) => (
