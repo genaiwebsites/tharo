@@ -18,6 +18,7 @@ import WarmRoomWedding from '@/components/sections/WarmRoomWedding';
 import TheFitting from '@/components/sections/TheFitting';
 import ClientDiaries from '@/components/sections/ClientDiaries';
 import FittingRoomCard from '@/components/sections/FittingRoomCard';
+import VolumetricAtelierStudio from '@/components/sections/VolumetricAtelierStudio';
 import { computeStoreStatus } from '@/lib/storeStatus';
 import { StoreStatus } from '@/lib/types';
 
@@ -224,6 +225,7 @@ export default function Home() {
         <TheFitting />
         <ClientDiaries />
         <FittingRoomCard />
+        <VolumetricAtelierStudio />
       </main>
 
       <Footer />
