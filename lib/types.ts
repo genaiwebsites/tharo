@@ -20,6 +20,9 @@ export interface FittingStage {
   n: string;
   name: string;
   piece: string;
+  duration: string;
+  metric: string;
+  metricLabel: string;
   note: string;
   cut: string;
   seam: string;

@@ -43,25 +43,11 @@ export default function TheRail() {
       r.style.cursor = 'grab';
     };
 
-    const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      const max = r.scrollWidth - r.clientWidth;
-      if (
-        (r.scrollLeft > 0 && r.scrollLeft < max) ||
-        (r.scrollLeft === 0 && e.deltaY > 0) ||
-        (r.scrollLeft >= max && e.deltaY < 0)
-      ) {
-        r.scrollLeft += e.deltaY;
-        e.preventDefault();
-      }
-    };
-
     r.addEventListener('scroll', handleScroll, { passive: true });
     r.addEventListener('pointerdown', handlePointerDown);
     r.addEventListener('pointermove', handlePointerMove);
     r.addEventListener('pointerup', handlePointerUp);
     r.addEventListener('pointercancel', handlePointerUp);
-    r.addEventListener('wheel', handleWheel, { passive: false });
 
     // Animation frame for inertia skew and settling
     let animId: number;
@@ -83,7 +69,6 @@ export default function TheRail() {
       r.removeEventListener('pointermove', handlePointerMove);
       r.removeEventListener('pointerup', handlePointerUp);
       r.removeEventListener('pointercancel', handlePointerUp);
-      r.removeEventListener('wheel', handleWheel);
     };
   }, []);
 

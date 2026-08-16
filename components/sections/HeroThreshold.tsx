@@ -154,7 +154,6 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
             backgroundPosition: 'center 35%',
             opacity: 0.88,
             willChange: 'transform, opacity',
-            transition: 'transform 120ms ease-out',
             filter: 'contrast(1.08) brightness(0.9)',
           }}
         />
@@ -171,7 +170,6 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
             backgroundPosition: 'center 45%',
             opacity: 0,
             willChange: 'transform, opacity',
-            transition: 'transform 120ms ease-out',
             filter: 'contrast(1.06) brightness(0.88)',
           }}
         />

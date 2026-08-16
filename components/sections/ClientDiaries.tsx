@@ -21,9 +21,7 @@ export default function ClientDiaries() {
       const dist = Math.max(0, track.scrollWidth - window.innerWidth + 120);
       const x = -dp * dist;
 
-      dxRef.current = dxRef.current === 0 ? x : dxRef.current + (x - dxRef.current) * 0.12;
-      const sk = Math.max(-3, Math.min(3, (x - dxRef.current) * 0.06));
-      track.style.transform = `translate3d(${dxRef.current.toFixed(1)}px, 0, 0) skewX(${sk.toFixed(2)}deg)`;
+      track.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });

@@ -36,14 +36,14 @@ export default function Home() {
     // Register GSAP ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
 
-    // Initialize Lenis smooth scroll
+    // Initialize Lenis butter-smooth scroll
     const lenis = new Lenis({
-      lerp: 0.082,
-      wheelMultiplier: 0.9,
+      lerp: 0.075,
       smoothWheel: true,
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.25,
+      infinite: false,
     });
-
-    lenis.on('scroll', ScrollTrigger.update);
 
     const gsapTicker = (time: number) => {
       lenis.raf(time * 1000);
@@ -53,17 +53,17 @@ export default function Home() {
     gsap.ticker.lagSmoothing(0);
 
     // Dynamic temperature applicator
-    const applyTemperature = () => {
+    const applyTemperature = (currentScrollY: number) => {
       const handEl = document.getElementById('the-hand');
       const warmEl = document.getElementById('warm-room');
       const closeEl = document.getElementById('fitting-room');
 
-      const handY = handEl ? handEl.getBoundingClientRect().top + window.scrollY : null;
-      const warmY = warmEl ? warmEl.getBoundingClientRect().top + window.scrollY : null;
-      const closeY = closeEl ? closeEl.getBoundingClientRect().top + window.scrollY : null;
+      const handY = handEl ? handEl.getBoundingClientRect().top + currentScrollY : null;
+      const warmY = warmEl ? warmEl.getBoundingClientRect().top + currentScrollY : null;
+      const closeY = closeEl ? closeEl.getBoundingClientRect().top + currentScrollY : null;
 
       const vh = window.innerHeight;
-      const mid = window.scrollY + vh * 0.5;
+      const mid = currentScrollY + vh * 0.5;
       let w = 0;
 
       if (handY != null && warmY != null) {
@@ -95,44 +95,37 @@ export default function Home() {
       );
     };
 
-    let ticking = false;
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const thresholdEl = document.getElementById('threshold');
-          const meaningEl = document.getElementById('meaning');
-          const vh = window.innerHeight;
+    lenis.on('scroll', (e: { scroll: number }) => {
+      ScrollTrigger.update();
 
-          let triggerY = 0;
-          if (thresholdEl) {
-            const span = Math.max(1, thresholdEl.offsetHeight - vh);
-            triggerY = thresholdEl.offsetTop + span * 0.80;
-          } else if (meaningEl) {
-            triggerY = meaningEl.offsetTop;
-          }
+      const scrollY = e.scroll;
+      const thresholdEl = document.getElementById('threshold');
+      const meaningEl = document.getElementById('meaning');
+      const vh = window.innerHeight;
 
-          // Immediately start threadline from Hero Beat 3 ending
-          const hasPassedHeroBeat3 = window.scrollY >= triggerY;
-          setIsHeroPassed((prev) => (prev !== hasPassedHeroBeat3 ? hasPassedHeroBeat3 : prev));
-
-          if (hasPassedHeroBeat3) {
-            const totalHeight = document.documentElement.scrollHeight - vh;
-            const totalSpan = Math.max(1, totalHeight - triggerY);
-            const relativeScroll = Math.max(0, window.scrollY - triggerY);
-            const tProg = Math.min(1, Math.max(0, relativeScroll / totalSpan));
-            setThreadProgress((prev) => (Math.abs(prev - tProg) > 0.001 ? tProg : prev));
-          } else {
-            setThreadProgress((prev) => (prev !== 0 ? 0 : prev));
-          }
-
-          applyTemperature();
-          ticking = false;
-        });
-        ticking = true;
+      let triggerY = 0;
+      if (thresholdEl) {
+        const span = Math.max(1, thresholdEl.offsetHeight - vh);
+        triggerY = thresholdEl.offsetTop + span * 0.8;
+      } else if (meaningEl) {
+        triggerY = meaningEl.offsetTop;
       }
-    };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+      const hasPassedHeroBeat3 = scrollY >= triggerY;
+      setIsHeroPassed((prev) => (prev !== hasPassedHeroBeat3 ? hasPassedHeroBeat3 : prev));
+
+      if (hasPassedHeroBeat3) {
+        const totalHeight = document.documentElement.scrollHeight - vh;
+        const totalSpan = Math.max(1, totalHeight - triggerY);
+        const relativeScroll = Math.max(0, scrollY - triggerY);
+        const tProg = Math.min(1, Math.max(0, relativeScroll / totalSpan));
+        setThreadProgress((prev) => (Math.abs(prev - tProg) > 0.001 ? tProg : prev));
+      } else {
+        setThreadProgress((prev) => (prev !== 0 ? 0 : prev));
+      }
+
+      applyTemperature(scrollY);
+    });
 
     // Staggered reveals via GSAP
     const revealElements = document.querySelectorAll('[data-reveal]');
@@ -194,7 +187,6 @@ export default function Home() {
     });
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
       gsap.ticker.remove(gsapTicker);
       lenis.destroy();
       ScrollTrigger.getAll().forEach((t) => t.kill());

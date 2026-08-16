@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { CHAPTERS } from '@/lib/constants';
 
 interface TheThreadProps {
@@ -20,7 +20,8 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
   const badgeRomanRef = useRef<HTMLSpanElement>(null);
   const badgeLabelRef = useRef<HTMLSpanElement>(null);
 
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isRailHovered, setIsRailHovered] = useState<boolean>(false);
+  const [hoveredKnotId, setHoveredKnotId] = useState<string | null>(null);
 
   const knotsRef = useRef<
     Array<{
@@ -44,20 +45,23 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
     };
   }, []);
 
-  const getPointAtY = (y: number) => {
-    const { cx, amp, wavelength } = geometry;
-    const phase = (2 * Math.PI * y) / wavelength;
-    const x = cx + amp * Math.sin(phase);
-    const dx_dy = amp * ((2 * Math.PI) / wavelength) * Math.cos(phase);
-    const rawAngleDeg = (Math.atan2(1, dx_dy) * 180) / Math.PI;
-    const angle = 90 + (rawAngleDeg - 90) * 0.45;
-    return { x, y, angle };
-  };
+  const getPointAtY = useCallback(
+    (y: number) => {
+      const { cx, amp, wavelength } = geometry;
+      const phase = (2 * Math.PI * y) / wavelength;
+      const x = cx + amp * Math.sin(phase);
+      const dx_dy = amp * ((2 * Math.PI) / wavelength) * Math.cos(phase);
+      const rawAngleDeg = (Math.atan2(1, dx_dy) * 180) / Math.PI;
+      const angle = 90 + (rawAngleDeg - 90) * 0.45;
+      return { x, y, angle };
+    },
+    [geometry]
+  );
 
   const [dCord, setDCord] = useState<string>('');
   const [dCouching, setDCouching] = useState<string>('');
   const [chapterList, setChapterList] = useState<
-    Array<{ id: string; label: string; roman: string; x: number; y: number }>
+    Array<{ id: string; label: string; roman: string; x: number; y: number; fraction: number }>
   >([]);
 
   useEffect(() => {
@@ -105,7 +109,7 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       let startY = 0;
       if (thresholdEl) {
         const span = Math.max(1, thresholdEl.offsetHeight - H);
-        startY = thresholdEl.offsetTop + span * 0.80;
+        startY = thresholdEl.offsetTop + span * 0.8;
       } else if (meaningEl) {
         startY = meaningEl.offsetTop;
       }
@@ -113,8 +117,8 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       const docHeight = document.documentElement.scrollHeight;
       const totalSpan = Math.max(1, docHeight - startY - window.innerHeight);
 
-      const topY = 24;
-      const bottomY = H - 28;
+      const topY = 28;
+      const bottomY = H - 32;
       const usableSpan = bottomY - topY;
 
       const calculatedKnots = CHAPTERS.map((c, idx) => {
@@ -137,7 +141,16 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       });
 
       knotsRef.current = calculatedKnots;
-      setChapterList(calculatedKnots.map((k) => ({ id: k.id, label: k.label, roman: k.roman, x: k.x, y: k.y })));
+      setChapterList(
+        calculatedKnots.map((k) => ({
+          id: k.id,
+          label: k.label,
+          roman: k.roman,
+          x: k.x,
+          y: k.y,
+          fraction: k.fraction,
+        }))
+      );
       setDCord(cordStr);
       setDCouching(couchingStr);
     };
@@ -145,22 +158,21 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
     buildGeometry();
     window.addEventListener('resize', buildGeometry);
     return () => window.removeEventListener('resize', buildGeometry);
-  }, [geometry]);
+  }, [geometry, getPointAtY]);
 
   // Synchronize scroll progress directly on DOM refs with zero React re-render churn
   useEffect(() => {
     if (!visible) return;
 
     const H = Math.max(500, window.innerHeight);
-    const topY = 24;
-    const bottomY = H - 28;
+    const topY = 28;
+    const bottomY = H - 32;
     const usableSpan = bottomY - topY;
 
     const clampedProg = Math.min(1, Math.max(0, scrollProgress));
     const yPos = topY + clampedProg * usableSpan;
     const pt = getPointAtY(yPos);
 
-    // Thread is physically and seamlessly drawn exactly up to needle position with 0 gap
     if (clipRectRef.current) {
       clipRectRef.current.setAttribute('height', `${Math.max(0, yPos + 4)}`);
     }
@@ -172,19 +184,21 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       );
     }
 
-    // Update chapter knots directly
+    // Update chapter knots
     let activeKnot = knotsRef.current[0];
     knotsRef.current.forEach((k) => {
       const isActive = clampedProg >= k.fraction - 0.02;
       if (isActive) activeKnot = k;
 
       if (k.eyeletOuter) {
-        k.eyeletOuter.style.opacity = isActive ? '0.95' : '0';
+        k.eyeletOuter.style.opacity = isActive ? '0.95' : '0.25';
         k.eyeletOuter.setAttribute('r', isActive ? '5' : '3');
+        k.eyeletOuter.setAttribute('stroke', isActive ? '#e5bd71' : '#cfd3e5');
       }
       if (k.eyeletInner) {
-        k.eyeletInner.style.opacity = isActive ? '1' : '0';
+        k.eyeletInner.style.opacity = isActive ? '1' : '0.4';
         k.eyeletInner.setAttribute('r', isActive ? '2' : '1');
+        k.eyeletInner.setAttribute('fill', isActive ? '#ffffff' : '#cfd3e5');
       }
     });
 
@@ -193,21 +207,31 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       if (badgeRomanRef.current) badgeRomanRef.current.textContent = activeKnot.roman;
       if (badgeLabelRef.current) badgeLabelRef.current.textContent = activeKnot.label;
     }
-  }, [scrollProgress, visible]);
+  }, [scrollProgress, visible, getPointAtY]);
+
+  const handleKnotClick = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <aside
       ref={containerRef}
       id="thread-rail"
-      aria-label="Reading stitch progress indicator"
-      onPointerEnter={() => setIsHovered(true)}
-      onPointerLeave={() => setIsHovered(false)}
+      aria-label="Continuous Cornelli Thread Progress Spine"
+      onPointerEnter={() => setIsRailHovered(true)}
+      onPointerLeave={() => {
+        setIsRailHovered(false);
+        setHoveredKnotId(null);
+      }}
       style={{
         position: 'fixed',
         left: 0,
         top: 0,
         bottom: 0,
-        width: '80px',
+        width: '84px',
         zIndex: 50,
         pointerEvents: 'auto',
         cursor: 'default',
@@ -229,19 +253,20 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
         <defs>
           <linearGradient id="silver-cord-glow" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
-            <stop offset="45%" stopColor="#e4e7f5" stopOpacity="0.95" />
-            <stop offset="80%" stopColor="#cfd3e5" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#8d94a8" stopOpacity="0.7" />
+            <stop offset="40%" stopColor="#f3f5fe" stopOpacity="0.95" />
+            <stop offset="75%" stopColor="#cfd3e5" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#c5a880" stopOpacity="0.75" />
           </linearGradient>
 
           <linearGradient id="needle-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="50%" stopColor="#dce0ef" />
-            <stop offset="100%" stopColor="#62687a" />
+            <stop offset="45%" stopColor="#f3f5fe" />
+            <stop offset="85%" stopColor="#e5bd71" />
+            <stop offset="100%" stopColor="#8a734e" />
           </linearGradient>
 
           <filter id="soft-thread-glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -249,20 +274,30 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
           </filter>
 
           <filter id="needle-starlight-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
 
-          {/* Strict ClipPath: Ensures EVERYTHING draws seamlessly up to current needle Y with zero lag */}
+          {/* Strict ClipPath: Ensures EVERYTHING draws seamlessly up to current needle Y with zero gap */}
           <clipPath id="thread-scrolled-clip">
-            <rect ref={clipRectRef} x="0" y="0" width="100" height="24" />
+            <rect ref={clipRectRef} x="0" y="0" width="100" height="28" />
           </clipPath>
         </defs>
 
-        {/* Group clipped strictly to current needle scroll position so thread directly enters needle eye */}
+        {/* 0. Subtle Background Guide Track */}
+        <path
+          d={dCord}
+          fill="none"
+          stroke="rgba(207, 211, 229, 0.12)"
+          strokeWidth="1.2"
+          strokeDasharray="3 4"
+          vectorEffect="non-scaling-stroke"
+        />
+
+        {/* Group clipped strictly to current needle scroll position */}
         <g clipPath="url(#thread-scrolled-clip)">
           {/* 1. Fabric Shadow of the active cord */}
           <path
@@ -270,10 +305,10 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
             d={dCord}
             fill="none"
             stroke="#06090f"
-            strokeWidth="2.8"
+            strokeWidth="3.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            opacity="0.6"
+            opacity="0.65"
             vectorEffect="non-scaling-stroke"
           />
 
@@ -284,7 +319,7 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
             stroke="#cfd3e5"
             strokeWidth="1.1"
             strokeLinecap="round"
-            opacity="0.45"
+            opacity="0.5"
             vectorEffect="non-scaling-stroke"
           />
 
@@ -294,7 +329,7 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
             d={dCord}
             fill="none"
             stroke="url(#silver-cord-glow)"
-            strokeWidth="1.8"
+            strokeWidth="2.0"
             strokeLinecap="round"
             strokeLinejoin="round"
             filter="url(#soft-thread-glow)"
@@ -303,55 +338,68 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
         </g>
 
         {/* 4. Chapter Tension Eyelets */}
-        {chapterList.map((k, idx) => (
-          <g key={k.id} className="chapter-eyelet" style={{ cursor: 'pointer' }}>
-            {/* Outer Ring */}
-            <circle
-              ref={(el) => {
-                if (knotsRef.current[idx]) knotsRef.current[idx].eyeletOuter = el;
-              }}
-              cx={k.x.toFixed(1)}
-              cy={k.y.toFixed(1)}
-              r="3"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth="1.2"
-              opacity="0"
-              filter="url(#soft-thread-glow)"
-              style={{
-                transition:
-                  'r 300ms cubic-bezier(0.16, 1, 0.3, 1), stroke 300ms ease, opacity 300ms ease',
-              }}
-              vectorEffect="non-scaling-stroke"
-            />
+        {chapterList.map((k, idx) => {
+          const isKnotHovered = hoveredKnotId === k.id;
+          return (
+            <g
+              key={k.id}
+              className="chapter-eyelet"
+              onClick={() => handleKnotClick(k.id)}
+              onPointerEnter={() => setHoveredKnotId(k.id)}
+              onPointerLeave={() => setHoveredKnotId(null)}
+              style={{ cursor: 'pointer' }}
+            >
+              {/* Invisible touch/hover target */}
+              <circle cx={k.x.toFixed(1)} cy={k.y.toFixed(1)} r="14" fill="transparent" />
 
-            {/* Inner Core Knot */}
-            <circle
-              ref={(el) => {
-                if (knotsRef.current[idx]) knotsRef.current[idx].eyeletInner = el;
-              }}
-              cx={k.x.toFixed(1)}
-              cy={k.y.toFixed(1)}
-              r="1"
-              fill="#ffffff"
-              opacity="0"
-              style={{ transition: 'r 250ms ease, fill 250ms ease, opacity 250ms ease' }}
-            />
-          </g>
-        ))}
+              {/* Outer Ring */}
+              <circle
+                ref={(el) => {
+                  if (knotsRef.current[idx]) knotsRef.current[idx].eyeletOuter = el;
+                }}
+                cx={k.x.toFixed(1)}
+                cy={k.y.toFixed(1)}
+                r={isKnotHovered ? '6' : '3'}
+                fill="rgba(11, 15, 24, 0.9)"
+                stroke="#ffffff"
+                strokeWidth="1.2"
+                opacity="0.25"
+                filter="url(#soft-thread-glow)"
+                style={{
+                  transition:
+                    'r 300ms cubic-bezier(0.16, 1, 0.3, 1), stroke 300ms ease, opacity 300ms ease',
+                }}
+                vectorEffect="non-scaling-stroke"
+              />
+
+              {/* Inner Core Knot */}
+              <circle
+                ref={(el) => {
+                  if (knotsRef.current[idx]) knotsRef.current[idx].eyeletInner = el;
+                }}
+                cx={k.x.toFixed(1)}
+                cy={k.y.toFixed(1)}
+                r={isKnotHovered ? '2.5' : '1'}
+                fill="#ffffff"
+                opacity="0.4"
+                style={{ transition: 'r 250ms ease, fill 250ms ease, opacity 250ms ease' }}
+              />
+            </g>
+          );
+        })}
 
         {/* 5. Sleek Bespoke Tailor's Sewing Needle at Current Scroll Tip */}
         <g
           ref={needleGroupRef}
-          transform="translate(36, 24) rotate(90)"
+          transform="translate(36, 28) rotate(90)"
           opacity={visible ? 1 : 0}
         >
           {/* Subtle Needle Ambient Halo */}
-          <circle r="8" fill="#ffffff" opacity="0.12" filter="url(#needle-starlight-glow)" />
+          <circle r="9" fill="#e5bd71" opacity="0.16" filter="url(#needle-starlight-glow)" />
 
           {/* Slender Needle Blade */}
           <path
-            d="M 0 -11 L 1.6 -2 L 0.8 9 L 0 13 L -0.8 9 L -1.6 -2 Z"
+            d="M 0 -12 L 1.6 -3 L 0.8 9 L 0 14 L -0.8 9 L -1.6 -3 Z"
             fill="url(#needle-gradient)"
             stroke="#ffffff"
             strokeWidth="0.4"
@@ -359,36 +407,37 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
           />
 
           {/* Needle Eyelet */}
-          <ellipse cx="0" cy="-5" rx="0.55" ry="1.6" fill="#0b0f18" />
-          <circle cx="0" cy="-5" r="0.45" fill="#ffffff" />
+          <ellipse cx="0" cy="-6" rx="0.55" ry="1.6" fill="#0b0f18" />
+          <circle cx="0" cy="-6" r="0.45" fill="#e5bd71" />
 
           {/* Trailing Active Starlight Stitch */}
-          <circle cx="0" cy="13" r="1.3" fill="#ffffff" filter="url(#soft-thread-glow)" />
+          <circle cx="0" cy="14" r="1.4" fill="#e5bd71" filter="url(#soft-thread-glow)" />
         </g>
       </svg>
 
-      {/* 6. Floating Chapter Indicator Badge: Only shown on hover to keep UI clean and uncluttered */}
+      {/* 6. Floating Chapter Indicator Badge */}
       <div
         ref={badgeRef}
         style={{
           position: 'absolute',
           left: '48px',
-          top: '24px',
-          transform: isHovered ? 'translateY(-50%) translateX(0)' : 'translateY(-50%) translateX(-6px)',
+          top: '28px',
+          transform: isRailHovered ? 'translateY(-50%) translateX(0)' : 'translateY(-50%) translateX(-6px)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '5px 12px',
+          padding: '6px 14px',
           borderRadius: '4px',
           background: 'rgba(11, 15, 24, 0.94)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(207, 211, 229, 0.24)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.65), 0 0 12px rgba(207, 211, 229, 0.08)',
+          border: '1px solid rgba(229, 189, 113, 0.3)',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.75), 0 0 14px rgba(229, 189, 113, 0.12)',
           whiteSpace: 'nowrap',
-          pointerEvents: isHovered ? 'auto' : 'none',
-          opacity: visible && isHovered ? 1 : 0,
-          transition: 'opacity 220ms cubic-bezier(0.16, 1, 0.3, 1), transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
+          pointerEvents: isRailHovered ? 'auto' : 'none',
+          opacity: visible && isRailHovered ? 1 : 0,
+          transition:
+            'opacity 240ms cubic-bezier(0.16, 1, 0.3, 1), transform 240ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {/* Connecting Hairline Lead from Knot */}
@@ -399,7 +448,7 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
             top: '50%',
             width: '8px',
             height: '1px',
-            background: 'linear-gradient(90deg, rgba(207, 211, 229, 0.5), rgba(207, 211, 229, 0.1))',
+            background: 'linear-gradient(90deg, rgba(229, 189, 113, 0.6), rgba(229, 189, 113, 0.1))',
           }}
         />
 
@@ -407,12 +456,11 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
         <span
           ref={badgeRomanRef}
           style={{
-            fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
-            fontSize: '12px',
-            fontStyle: 'italic',
-            color: '#cfd3e5',
+            fontFamily: 'var(--font-cinzel), Georgia, serif',
+            fontSize: '11px',
+            color: '#c5a880',
             borderRight: '1px solid rgba(207, 211, 229, 0.22)',
-            paddingRight: '6px',
+            paddingRight: '8px',
           }}
         >
           I
@@ -422,9 +470,9 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
         <span
           ref={badgeLabelRef}
           style={{
-            fontSize: '9px',
+            fontSize: '10px',
             fontWeight: 500,
-            letterSpacing: '0.2em',
+            letterSpacing: '0.22em',
             textTransform: 'uppercase',
             color: '#f3f5fe',
           }}
