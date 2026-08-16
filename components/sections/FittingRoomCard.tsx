@@ -387,7 +387,7 @@ export default function FittingRoomCard() {
               {/* Card Header Monogram */}
               <div style={{ textAlign: 'center' }}>
                 <Image
-                  src="/images/tharo_logo_dark.png"
+                  src="/images/brand/tharo-logo-dark.png"
                   alt="THARO"
                   width={95}
                   height={25}

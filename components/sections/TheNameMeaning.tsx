@@ -106,8 +106,8 @@ export default function TheNameMeaning() {
               }}
             >
               <Image
-                src="/images/navy_suit_shoulder.png"
-                alt="Silver cornelli soutache hand-embroidery across the shoulder of bespoke Tharo navy tailoring"
+                src="/images/collection/tharo-navy-bespoke-suit-structured-shoulder.png"
+                alt="Silver cornelli soutache hand-embroidery across the shoulder of bespoke THARO navy tailoring"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{

@@ -151,8 +151,8 @@ button {
     #ffffff 100%
   );
   background-size: 200% auto;
-  mask-image: url('/images/tharo_wordmark_hero.png');
-  -webkit-mask-image: url('/images/tharo_wordmark_hero.png');
+  mask-image: url('/images/brand/tharo-wordmark-hero-3d.png');
+  -webkit-mask-image: url('/images/brand/tharo-wordmark-hero-3d.png');
   mask-size: contain;
   -webkit-mask-size: contain;
   mask-repeat: no-repeat;

@@ -86,8 +86,8 @@ export default function BlueRoom() {
               }}
             >
               <Image
-                src="/images/blue_tux_sequin.png"
-                alt="Navy sequin-embroidered tuxedo worn against deep blue wainscot panelling"
+                src="/images/collection/tharo-midnight-blue-sequin-velvet-tuxedo.png"
+                alt="THARO midnight navy sequin-embroidered bespoke tuxedo in deep blue salon"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'cover', filter: 'saturate(.9) contrast(1.03)' }}
@@ -129,8 +129,8 @@ export default function BlueRoom() {
               }}
             >
               <Image
-                src="/images/blue_jacket_silver.png"
-                alt="Black jacket with silver soutache embroidery along the shoulder and sleeve"
+                src="/images/collection/tharo-royal-blue-raw-silk-jacket-silver-embroidery.png"
+                alt="THARO royal blue raw silk dinner jacket with artisanal silver soutache embroidery"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'cover', filter: 'saturate(.9) contrast(1.03)' }}
@@ -172,8 +172,8 @@ export default function BlueRoom() {
               }}
             >
               <Image
-                src="/images/macro_cornelli_b.png"
-                alt="Macro detail of silver cornelli thread coiling across black cloth"
+                src="/images/craft/tharo-cornelli-corded-threadwork-macro.png"
+                alt="Macro detail of THARO silver corded cornelli thread coiling across black silk cloth"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 style={{ objectFit: 'cover', filter: 'saturate(.86) contrast(1.06)' }}
@@ -230,8 +230,8 @@ export default function BlueRoom() {
               }}
             >
               <Image
-                src="/images/oxblood_jacket.png"
-                alt="Oxblood maroon dinner jacket with tonal beadwork, photographed in the Blue Room"
+                src="/images/collection/tharo-oxblood-velvet-dinner-jacket.png"
+                alt="THARO oxblood maroon bespoke dinner jacket with tonal hand beadwork"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'cover', filter: 'saturate(.94) contrast(1.03)' }}
@@ -269,8 +269,8 @@ export default function BlueRoom() {
               }}
             >
               <Image
-                src="/images/navy_suit_shoulder.png"
-                alt="Navy suit with silver embroidery worked across one shoulder"
+                src="/images/collection/tharo-navy-bespoke-suit-structured-shoulder.png"
+                alt="THARO bespoke midnight navy suit with architectural shoulder and silver threadwork"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'cover', filter: 'saturate(.9) contrast(1.03)' }}

@@ -17,48 +17,48 @@ export const OCCASIONS: Occasion[] = [
     name: 'Haldi',
     color: '#c9971f',
     note: 'Yellow, worn in daylight',
-    hero: '/images/kurta_haldi.png',
-    heroAlt: 'Marigold yellow kurta with tonal embroidery, worn against a limewash wall',
-    detail: '/images/kurta_haldi_pair.png',
-    detailAlt: 'Two kurtas in shades of yellow, worn together at a haldi',
-    support: '/images/kurta_rose.png',
-    supportAlt: 'Rose kurta with embroidered chest panel and ivory pyjama'
+    hero: '/images/collection/tharo-haldi-yellow-festive-kurta.png',
+    heroAlt: 'THARO marigold yellow festive silk kurta with tonal hand embroidery for Haldi ceremony',
+    detail: '/images/collection/tharo-haldi-yellow-kurta-couple-ensemble.png',
+    detailAlt: 'THARO bespoke yellow kurta wedding couple celebration ensemble',
+    support: '/images/collection/tharo-rose-pink-silk-kurta-churidar.png',
+    supportAlt: 'THARO rose pink silk kurta with embroidered chest panel and tailored churidar'
   },
   {
     id: 'sangeet',
     name: 'Sangeet',
     color: '#b3707a',
     note: 'Rose and blush, thread-painted',
-    hero: '/images/kurta_rose.png',
-    heroAlt: 'Rose kurta with thread-painted floral embroidery, warm room',
-    detail: '/images/macro_floral_rose.png',
-    detailAlt: 'Macro of thread-painted floral embroidery on a rose sleeve',
-    support: '/images/kurta_grey_floral.png',
-    supportAlt: 'Grey kurta with silver floral embroidery across the chest'
+    hero: '/images/collection/tharo-rose-pink-silk-kurta-churidar.png',
+    heroAlt: 'THARO rose pink silk kurta with artisanal thread-painted floral embroidery for Sangeet',
+    detail: '/images/craft/tharo-rose-silk-floral-resham-macro.png',
+    detailAlt: 'Macro closeup of THARO handcrafted floral resham needlework on pure rose silk sleeve',
+    support: '/images/collection/tharo-grey-raw-silk-floral-embroidered-kurta.png',
+    supportAlt: 'THARO charcoal grey raw silk kurta with silver floral embroidery'
   },
   {
     id: 'wedding',
     name: 'Wedding',
     color: '#d8c9a3',
     note: 'Ivory and metallic thread',
-    hero: '/images/sherwani_turban.png',
-    heroAlt: 'Groom in an ivory sherwani and turban with emerald mala, under an arched niche',
-    detail: '/images/macro_ivory_thread.png',
-    detailAlt: 'Macro of metallic zardozi thread-work forming a bird on ivory silk',
-    support: '/images/sherwani_ivory.png',
-    supportAlt: 'Ivory sherwani with tonal embroidery, worn with ivory trousers'
+    hero: '/images/collection/tharo-ivory-sherwani-safaa-groom-turban.png',
+    heroAlt: 'THARO regal groom wearing ivory silk wedding sherwani and safaa turban with emerald mala',
+    detail: '/images/craft/tharo-ivory-zari-needlework-macro.png',
+    detailAlt: 'Macro detail of THARO heritage zardozi metallic gold and silver needlework on ivory silk',
+    support: '/images/collection/tharo-ivory-regal-wedding-sherwani.png',
+    supportAlt: 'THARO bespoke ivory royal wedding sherwani with tonal architectural embroidery'
   },
   {
     id: 'reception',
     name: 'Reception',
     color: '#9aa892',
     note: 'Sage and powder blue',
-    hero: '/images/bandi_sage.png',
-    heroAlt: 'Sage green bandi and kurta set, worn in the warm room',
-    detail: '/images/bandi_powder_blue.png',
-    detailAlt: 'Powder blue bandi over an ivory kurta with silver floral work',
-    support: '/images/kurta_grey_floral.png',
-    supportAlt: 'Grey kurta with silver floral embroidery across the chest'
+    hero: '/images/collection/tharo-sage-green-tailored-bandi-jacket.png',
+    heroAlt: 'THARO sage green tailored Nehru bandi jacket over matching silk kurta set',
+    detail: '/images/collection/tharo-powder-blue-hand-tailored-bandi-jacket.png',
+    detailAlt: 'THARO powder blue hand-tailored bandi over an ivory kurta with fine silver accents',
+    support: '/images/collection/tharo-grey-raw-silk-floral-embroidered-kurta.png',
+    supportAlt: 'THARO grey raw silk kurta with silver floral threadwork across the chest'
   }
 ];
 
@@ -119,76 +119,76 @@ export const LOUPE_PLATES: LoupePlate[] = [
   {
     n: '01',
     name: 'Cornelli',
-    src: '/images/macro_cornelli.png',
-    alt: 'Macro detail of silver soutache cornelli embroidery coiling across a black jacket shoulder',
+    src: '/images/craft/tharo-cornelli-chain-stitch-embroidery-macro.png',
+    alt: 'Macro closeup of THARO silver soutache cornelli embroidery coiling across black tailored jacket shoulder',
     note: 'Silver soutache laid as one continuous line, turned back on itself until the shoulder reads as topography.'
   },
   {
     n: '02',
     name: 'Bead scatter',
-    src: '/images/macro_bead.png',
-    alt: 'Macro detail of bugle beads scattered across a navy lapel like a constellation',
+    src: '/images/craft/tharo-handcrafted-glass-beadwork-macro.png',
+    alt: 'Macro detail of THARO bugle glass beads scattered across midnight navy lapel like a constellation',
     note: 'Bugle beads set individually across the lapel. Density falls away as it climbs — nothing is repeated.'
   },
   {
     n: '03',
     name: 'Zardozi',
-    src: '/images/macro_ivory_thread.png',
-    alt: 'Macro detail of metallic zardozi thread-work forming a bird on ivory silk',
+    src: '/images/craft/tharo-ivory-zari-needlework-macro.png',
+    alt: 'Macro detail of THARO metallic gold zardozi threadwork forming an avian motif on pure ivory silk',
     note: 'Metallic thread on ivory, worked for the wedding sequence. The heaviest hand in the house.'
   },
   {
     n: '04',
     name: 'Thread-painted floral',
-    src: '/images/macro_floral_rose.png',
-    alt: 'Macro detail of thread-painted floral embroidery on the sleeve of a rose kurta',
+    src: '/images/craft/tharo-rose-silk-floral-resham-macro.png',
+    alt: 'Macro detail of THARO artisanal thread-painted resham floral embroidery on rose silk sleeve',
     note: 'Floral painting in thread. Colour is built in passes, the way a brush would build it.'
   }
 ];
 
 export const RAIL_ITEMS: RailItem[] = [
-  { src: '/images/rail_brass.png', alt: 'Brass rail hung with THARO-branded hangers and an embroidered white shirt', label: 'On the rail' },
-  { src: '/images/shirt_blue_motif.png', alt: 'White shirt with blue thread motif worked across the chest', label: 'Blue thread motif' },
-  { src: '/images/shirt_grey_cornelli.png', alt: 'White shirt with grey cornelli embroidery across both shoulders', label: 'Grey cornelli' },
-  { src: '/images/shirt_blue_floral.png', alt: 'White shirt with a blue floral embroidered panel at the shoulder', label: 'Floral panel' },
-  { src: '/images/product_blush_hanger.png', alt: 'Blush pink shirt on a THARO branded hanger', label: 'Blush shirting' },
-  { src: '/images/shirt_oxblood_sash.png', alt: 'Blush shirt with an oxblood sash detail, worn with maroon trousers', label: 'Sash detail' },
-  { src: '/images/black_kurta_silver.png', alt: 'Black kurta shirt with a silver embroidered squiggle across the chest', label: 'Silver on black' },
-  { src: '/images/shirt_maroon_hanger.png', alt: 'Maroon shirt with tonal beadwork, hung against a curtain', label: 'Maroon, beaded' },
-  { src: '/images/store_interior.png', alt: 'The lit Tharo store interior on Allenby Road, garments on brass rails', label: '31 Allenby Road' },
-  { src: '/images/product_bag.png', alt: 'A THARO shopping bag beside a white shirt on a branded hanger', label: 'Wrapped' }
+  { src: '/images/editorial/tharo-bespoke-brass-rail-curated-shirting.png', alt: 'THARO bespoke brass rail with hand-tailored shirts and bespoke hangers at 31 Allenby Road Kolkata atelier', label: 'On the rail' },
+  { src: '/images/collection/tharo-white-poplin-shirt-blue-thread-motif.png', alt: 'THARO bespoke white cotton poplin shirt with hand-embroidered blue thread motif', label: 'Blue thread motif' },
+  { src: '/images/collection/tharo-white-shirt-grey-cornelli-embroidery.png', alt: 'THARO tailored white shirt featuring subtle grey cornelli needlework across the yoke', label: 'Grey cornelli' },
+  { src: '/images/collection/tharo-white-shirt-blue-floral-shoulder-panel.png', alt: 'THARO white shirt with intricate royal blue floral resham threadwork panel', label: 'Floral panel' },
+  { src: '/images/collection/tharo-blush-pink-formal-shirting-hanger.png', alt: 'THARO blush pink custom shirting on bespoke wooden hanger', label: 'Blush shirting' },
+  { src: '/images/collection/tharo-blush-shirt-oxblood-sash-trousers.png', alt: 'THARO blush formal shirt with structured oxblood sash and tailored trousers', label: 'Sash detail' },
+  { src: '/images/collection/tharo-black-kurta-silver-zari-threadwork.png', alt: 'THARO midnight black festive kurta shirt with silver zari contour embroidery', label: 'Silver on black' },
+  { src: '/images/collection/tharo-maroon-shirt-tonal-beadwork.png', alt: 'THARO deep maroon evening shirt with delicate tonal hand-beadwork', label: 'Maroon, beaded' },
+  { src: '/images/editorial/tharo-31-allenby-road-calcutta-atelier-store.png', alt: 'THARO luxury menswear atelier interior at 31 Allenby Road, Kolkata', label: '31 Allenby Road' },
+  { src: '/images/editorial/tharo-signature-bespoke-packaging-bag.png', alt: 'THARO bespoke atelier garment packaging bag with gold-embossed monogram', label: 'Wrapped' }
 ];
 
 export const CLIENT_DIARIES: DiaryEntry[] = [
   {
-    src: '/images/diary_groom_arch.png',
+    src: '/images/diaries/tharo-client-diary-groom-palace-arch.png',
     occasion: 'Wedding',
     note: 'Ivory sherwani and turban, worn under the floral arch.',
-    alt: 'Client wearing an ivory Tharo sherwani and turban beneath a floral wedding arch'
+    alt: 'THARO bespoke groom client wearing ivory silk sherwani and safaa turban beneath palace floral wedding arch'
   },
   {
-    src: '/images/diary_couple.png',
+    src: '/images/diaries/tharo-client-diary-wedding-reception-couple.png',
     occasion: 'Reception',
     note: 'Orange kurta, cut to sit beside her lehenga.',
-    alt: 'A couple at their reception, the groom in an orange Tharo kurta'
+    alt: 'Client wedding couple at reception, groom dressed in bespoke THARO festive kurta ensemble'
   },
   {
-    src: '/images/diary_newborn.png',
+    src: '/images/diaries/tharo-client-diary-celebration-family-heirloom.png',
     occasion: 'First outing',
     note: 'Blue floral bandi, worn holding his son.',
-    alt: 'Client in a blue floral Tharo bandi holding his newborn son'
+    alt: 'Client in a bespoke powder blue floral THARO bandi jacket celebrating with his family'
   },
   {
-    src: '/images/diary_green_bandi.png',
+    src: '/images/diaries/tharo-client-diary-sage-bandi-ceremony.png',
     occasion: 'Sangeet',
     note: 'Sage bandi over a matching kurta set.',
-    alt: 'Client in a sage green Tharo bandi and kurta set outdoors'
+    alt: 'Client dressed in custom sage green THARO Nehru bandi jacket and silk kurta set'
   },
   {
-    src: '/images/diary_doorway.png',
+    src: '/images/diaries/tharo-client-diary-heritage-doorway-portrait.png',
     occasion: 'Wedding',
     note: 'Red and ivory kurta set, photographed at home.',
-    alt: 'Client in a red and ivory Tharo kurta set standing in a doorway'
+    alt: 'Client in a bespoke red and ivory THARO wedding kurta set in heritage Kolkata architecture'
   }
 ];
 

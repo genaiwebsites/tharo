@@ -149,7 +149,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
           style={{
             position: 'absolute',
             inset: '-8%',
-            backgroundImage: 'url(/images/hero_editorial_1.jpg)',
+            backgroundImage: 'url(/images/editorial/tharo-kolkata-heritage-menswear-hero-1.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center 35%',
             opacity: 0.88,
@@ -166,7 +166,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
           style={{
             position: 'absolute',
             inset: '-8%',
-            backgroundImage: 'url(/images/hero_editorial_2.jpg)',
+            backgroundImage: 'url(/images/editorial/tharo-kolkata-heritage-menswear-hero-2.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center 45%',
             opacity: 0,
@@ -183,7 +183,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
           style={{
             position: 'absolute',
             inset: '-8%',
-            backgroundImage: 'url(/images/blue_tux_sequin.png)',
+            backgroundImage: 'url(/images/collection/tharo-midnight-blue-sequin-velvet-tuxedo.png)',
             backgroundSize: 'cover',
             backgroundPosition: '56% 26%',
             opacity: 0,

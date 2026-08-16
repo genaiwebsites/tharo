@@ -55,10 +55,10 @@ export const metadata: Metadata = {
     siteName: 'Tharo',
     images: [
       {
-        url: '/images/blue_tux_sequin.png',
+        url: '/images/collection/tharo-midnight-blue-sequin-velvet-tuxedo.png',
         width: 1200,
         height: 800,
-        alt: 'Tharo Bespoke Menswear Kolkata'
+        alt: 'THARO Bespoke Menswear Kolkata — Midnight Blue Sequin Velvet Tuxedo'
       }
     ],
     locale: 'en_IN',
@@ -81,7 +81,7 @@ export default function RootLayout({
     name: 'Tharo — Designed For You',
     description:
       'Bespoke menswear house in Bhowanipore, Kolkata. Rajasthani hand-work, Calcutta tailoring. Made-to-measure tuxedos, bandhgalas, sherwanis, kurtas and shirting.',
-    image: 'https://tharo.in/images/blue_tux_sequin.png',
+    image: 'https://tharo.in/images/collection/tharo-midnight-blue-sequin-velvet-tuxedo.png',
     telephone: '+91 90625 12323',
     address: {
       '@type': 'PostalAddress',
