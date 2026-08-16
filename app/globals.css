@@ -135,6 +135,95 @@ button {
   filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 55px rgba(207, 211, 229, 0.45));
 }
 
+/* 3D Metallic Wordmark with Infinitely Running Sheen (Matching Devanagari 3D Shader) */
+.tharo-3d-wordmark {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f4f6fc 18%,
+    #b9c7dc 36%,
+    #ffffff 52%,
+    #f3ede2 66%,
+    #8898b0 82%,
+    #ffffff 100%
+  );
+  background-size: 200% auto;
+  mask-image: url('/images/tharo_wordmark_hero.png');
+  -webkit-mask-image: url('/images/tharo_wordmark_hero.png');
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+  animation: metallic-sheen 6.5s linear infinite;
+  will-change: background-position;
+}
+
+.tharo-3d-wordmark-hero {
+  width: clamp(260px, 48vw, 640px);
+  aspect-ratio: 599 / 158;
+  filter: 
+    drop-shadow(0 18px 24px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.8))
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.45));
+  transition: filter 350ms ease;
+}
+
+.tharo-3d-wordmark-hero:hover {
+  filter: 
+    drop-shadow(0 22px 30px rgba(0, 0, 0, 0.98))
+    drop-shadow(0 4px 8px rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.65));
+}
+
+.tharo-3d-wordmark-nav {
+  height: 24px;
+  width: calc(24px * 3.7911); /* ~91px */
+  aspect-ratio: 599 / 158;
+  filter: 
+    drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9))
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.35));
+  transition: filter 300ms ease;
+}
+
+.tharo-3d-wordmark-nav:hover {
+  filter: 
+    drop-shadow(0 3px 7px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.55));
+}
+
+.tharo-3d-wordmark-footer {
+  height: 28px;
+  width: calc(28px * 3.7911); /* ~106px */
+  aspect-ratio: 599 / 158;
+  filter: 
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.9))
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.35));
+  transition: filter 300ms ease;
+}
+
+.tharo-3d-wordmark-footer:hover {
+  filter: 
+    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.55));
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Highlighted 3D Metallic Gold Shader for Noto Sans Devanagari */
 .devanagari-3d-metallic {
   font-family: var(--font-noto-devanagari), sans-serif;

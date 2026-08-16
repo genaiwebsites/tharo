@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { computeStoreStatus } from '@/lib/storeStatus';
 import { StoreStatus } from '@/lib/types';
 
@@ -40,32 +41,32 @@ export default function Header() {
         justifyContent: 'space-between',
         gap: '24px',
         padding: isScrolled
-          ? '14px 32px 14px clamp(22px, 6.5vw, 92px)'
-          : '22px 32px 22px clamp(22px, 6.5vw, 92px)',
-        backdropFilter: isScrolled ? 'blur(14px)' : 'none',
-        WebkitBackdropFilter: isScrolled ? 'blur(14px)' : 'none',
+          ? '16px 32px 16px clamp(22px, 6.5vw, 92px)'
+          : '24px 32px 24px clamp(22px, 6.5vw, 92px)',
+        backdropFilter: isScrolled ? 'blur(20px) saturate(140%)' : 'none',
+        WebkitBackdropFilter: isScrolled ? 'blur(20px) saturate(140%)' : 'none',
         background: isScrolled
-          ? 'rgba(11, 15, 24, 0.78)'
+          ? 'linear-gradient(180deg, rgba(11, 15, 24, 0.88) 0%, rgba(11, 15, 24, 0.72) 100%)'
           : 'transparent',
-        borderBottom: isScrolled
-          ? '1px solid rgba(207, 211, 229, 0.08)'
-          : '1px solid transparent',
+        borderBottom: 'none',
+        boxShadow: isScrolled
+          ? '0 12px 32px -8px rgba(0, 0, 0, 0.75)'
+          : 'none',
         transition:
-          'padding 350ms cubic-bezier(0.16, 1, 0.3, 1), background 350ms ease, backdrop-filter 350ms ease, border-color 350ms ease'
+          'padding 400ms cubic-bezier(0.16, 1, 0.3, 1), background 400ms ease, backdrop-filter 400ms ease, box-shadow 400ms ease'
       }}
     >
       <Link
         href="#threshold"
         style={{
-          fontFamily: 'var(--font-cinzel), var(--font-cormorant), Georgia, serif',
-          fontSize: '18px',
-          letterSpacing: '0.42em',
-          fontWeight: 500,
-          color: '#e9e9ed',
+          display: 'inline-flex',
+          alignItems: 'center',
+          textDecoration: 'none',
           paddingRight: '6px'
         }}
+        aria-label="THARO — Back to top"
       >
-        THARO
+        <span className="tharo-3d-wordmark tharo-3d-wordmark-nav" role="img" aria-label="THARO" />
       </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>

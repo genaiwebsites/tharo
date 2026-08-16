@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { OCCASION_OPTIONS } from '@/lib/constants';
 import { StorePinIcon } from '@/components/common/Icons';
 
@@ -385,23 +386,22 @@ export default function FittingRoomCard() {
             <div style={{ position: 'relative', zIndex: 2, color: '#2b2722' }}>
               {/* Card Header Monogram */}
               <div style={{ textAlign: 'center' }}>
-                <p
+                <Image
+                  src="/images/tharo_logo_dark.png"
+                  alt="THARO"
+                  width={95}
+                  height={25}
                   style={{
-                    margin: 0,
-                    fontFamily: 'var(--font-cinzel), Georgia, serif',
-                    fontSize: '18px',
-                    letterSpacing: '0.45em',
-                    textIndent: '0.45em',
-                    fontWeight: 600,
-                    color: '#26221c',
-                    textShadow: '0 1px 1px rgba(255, 255, 255, 0.9), 0 -1px 1px rgba(0, 0, 0, 0.25)',
+                    height: '25px',
+                    width: 'auto',
+                    margin: '0 auto',
+                    display: 'block',
+                    objectFit: 'contain',
                   }}
-                >
-                  THARO
-                </p>
+                />
                 <p
                   style={{
-                    margin: '6px 0 0',
+                    margin: '8px 0 0',
                     fontSize: '8.5px',
                     letterSpacing: '0.36em',
                     textIndent: '0.36em',

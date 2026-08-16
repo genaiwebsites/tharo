@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { computeStoreStatus } from '@/lib/storeStatus';
 import { StoreStatus } from '@/lib/types';
 import { StorePinIcon, ClockStatusIcon } from '@/components/common/Icons';
@@ -33,21 +35,19 @@ export default function Footer() {
         }}
       >
         <div>
-          <p
+          <Link
+            href="#threshold"
             style={{
-              margin: 0,
-              fontFamily: 'var(--font-cinzel), var(--font-cormorant), Georgia, serif',
-              fontSize: '18px',
-              letterSpacing: '0.36em',
-              color: '#e9e9ed',
-              fontWeight: 500,
+              display: 'inline-block',
+              textDecoration: 'none',
             }}
+            aria-label="THARO"
           >
-            THARO
-          </p>
+            <span className="tharo-3d-wordmark tharo-3d-wordmark-footer" role="img" aria-label="THARO" />
+          </Link>
           <p
             style={{
-              margin: '10px 0 0',
+              margin: '12px 0 0',
               fontSize: '10.5px',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',

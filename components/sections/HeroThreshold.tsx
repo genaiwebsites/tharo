@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { StoreStatus } from '@/lib/types';
 
 interface HeroThresholdProps {
@@ -266,54 +267,65 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
               }}
             />
 
-            {/* 3D Sculpted Metallic Display Wordmark */}
+            {/* Authentic HD Brand Wordmark with 3D Metallic Shimmer Shader */}
             <h1
-              className="hero-3d-monograph"
+              aria-label="THARO"
               style={{
                 margin: 0,
-                animation: 'th-rise 1000ms ease 100ms both, metallic-sheen 6.5s linear infinite',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
               }}
             >
-              THARO
+              <div
+                className="tharo-3d-wordmark tharo-3d-wordmark-hero"
+                role="img"
+                aria-label="THARO"
+                style={{
+                  animation: 'th-rise 1100ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both, metallic-sheen 6.5s linear infinite',
+                }}
+              />
             </h1>
 
             {/* Editorial Subtitle with Luminous Gradient Hairlines */}
             <div
               style={{
-                marginTop: 'clamp(20px, 2.8vw, 32px)',
+                marginTop: 'clamp(22px, 2.6vw, 34px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '16px',
+                gap: '18px',
                 animation: 'th-fade 1000ms ease 250ms both',
               }}
             >
               <span
                 style={{
                   height: '1px',
-                  width: 'clamp(24px, 4vw, 44px)',
-                  background: 'linear-gradient(90deg, transparent, rgba(207, 211, 229, 0.55))',
+                  width: 'clamp(28px, 4.5vw, 56px)',
+                  background: 'linear-gradient(90deg, transparent, rgba(197, 168, 128, 0.55))',
                 }}
               />
               <p
                 style={{
                   margin: 0,
-                  fontSize: 'clamp(10.5px, 1.1vw, 12.5px)',
-                  letterSpacing: '0.36em',
-                  textTransform: 'uppercase',
-                  color: '#cfd7e6',
-                  fontWeight: 500,
-                  textIndent: '0.36em',
-                  textShadow: '0 2px 12px rgba(0, 0, 0, 0.95)',
+                  fontFamily: 'var(--font-cormorant), Georgia, serif',
+                  fontStyle: 'italic',
+                  fontWeight: 400,
+                  fontSize: 'clamp(18px, 1.85vw, 26px)',
+                  letterSpacing: '0.04em',
+                  color: '#ded7cb',
+                  textShadow: '0 2px 14px rgba(0, 0, 0, 0.95)',
+                  lineHeight: 1.2,
                 }}
               >
-                Designed for you • Calcutta Tailoring
+                Designed for you
               </p>
               <span
                 style={{
                   height: '1px',
-                  width: 'clamp(24px, 4vw, 44px)',
-                  background: 'linear-gradient(90deg, rgba(207, 211, 229, 0.55), transparent)',
+                  width: 'clamp(28px, 4.5vw, 56px)',
+                  background: 'linear-gradient(90deg, rgba(197, 168, 128, 0.55), transparent)',
                 }}
               />
             </div>
@@ -469,7 +481,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
           ))}
         </div>
 
-        {/* Hero Footer */}
+        {/* Hero Footer: Clean Scroll Cue */}
         <div
           ref={heroFootRef}
           style={{
@@ -480,34 +492,12 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
             zIndex: 10,
             display: 'flex',
             alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            gap: '24px',
+            justifyContent: 'flex-end',
             padding: '0 32px 34px clamp(22px, 6.5vw, 92px)',
             opacity: 0,
             animation: 'th-fade 1400ms cubic-bezier(0.16, 1, 0.3, 1) 900ms both',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              fontSize: '11.5px',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: '#9397ab',
-            }}
-          >
-            <span
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: storeStatus.open ? '#69b07a' : '#c5a880',
-              }}
-            />
-            {storeStatus.short}
-          </div>
 
           <div
             style={{
