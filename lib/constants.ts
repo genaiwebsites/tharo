@@ -31,8 +31,8 @@ export const OCCASIONS: Occasion[] = [
     note: 'Rose and blush, thread-painted',
     hero: '/images/collection/tharo-rose-pink-silk-kurta-churidar.png',
     heroAlt: 'THARO rose pink silk kurta with artisanal thread-painted floral embroidery for Sangeet',
-    detail: '/images/craft/tharo-rose-silk-floral-resham-macro.png',
-    detailAlt: 'Macro closeup of THARO handcrafted floral resham needlework on pure rose silk sleeve',
+    detail: '/images/collection/tharo-white-shirt-blue-floral-shoulder-panel.png',
+    detailAlt: 'THARO bespoke white shirt with royal blue floral resham threadwork panel',
     support: '/images/collection/tharo-grey-raw-silk-floral-embroidered-kurta.png',
     supportAlt: 'THARO charcoal grey raw silk kurta with silver floral embroidery'
   },
@@ -43,10 +43,10 @@ export const OCCASIONS: Occasion[] = [
     note: 'Ivory and metallic thread',
     hero: '/images/collection/tharo-ivory-sherwani-safaa-groom-turban.png',
     heroAlt: 'THARO regal groom wearing ivory silk wedding sherwani and safaa turban with emerald mala',
-    detail: '/images/craft/tharo-ivory-zari-needlework-macro.png',
-    detailAlt: 'Macro detail of THARO heritage zardozi metallic gold and silver needlework on ivory silk',
-    support: '/images/collection/tharo-ivory-regal-wedding-sherwani.png',
-    supportAlt: 'THARO bespoke ivory royal wedding sherwani with tonal architectural embroidery'
+    detail: '/images/collection/tharo-ivory-regal-wedding-sherwani.png',
+    detailAlt: 'THARO bespoke ivory royal wedding sherwani with tonal architectural embroidery',
+    support: '/images/collection/tharo-black-kurta-silver-zari-threadwork.png',
+    supportAlt: 'THARO midnight black festive kurta shirt with silver zari contour embroidery'
   },
   {
     id: 'reception',
@@ -118,30 +118,30 @@ export const FITTING_STAGES: FittingStage[] = [
 export const LOUPE_PLATES: LoupePlate[] = [
   {
     n: '01',
-    name: 'Cornelli',
-    src: '/images/craft/tharo-cornelli-chain-stitch-embroidery-macro.png',
-    alt: 'Macro closeup of THARO silver soutache cornelli embroidery coiling across black tailored jacket shoulder',
+    name: 'Cornelli Soutache',
+    src: '/images/collection/tharo-royal-blue-raw-silk-jacket-silver-embroidery.png',
+    alt: 'THARO royal blue raw silk dinner jacket with artisanal silver soutache embroidery',
     note: 'Silver soutache laid as one continuous line, turned back on itself until the shoulder reads as topography.'
   },
   {
     n: '02',
-    name: 'Bead scatter',
-    src: '/images/craft/tharo-handcrafted-glass-beadwork-macro.png',
-    alt: 'Macro detail of THARO bugle glass beads scattered across midnight navy lapel like a constellation',
-    note: 'Bugle beads set individually across the lapel. Density falls away as it climbs — nothing is repeated.'
+    name: 'Bead Scatter & Sequins',
+    src: '/images/collection/tharo-midnight-blue-sequin-velvet-tuxedo.png',
+    alt: 'THARO midnight navy sequin-embroidered bespoke tuxedo',
+    note: 'Bugle beads and micro-sequins set individually across the lapel. Density falls away as it climbs — nothing is repeated.'
   },
   {
     n: '03',
-    name: 'Zardozi',
-    src: '/images/craft/tharo-ivory-zari-needlework-macro.png',
-    alt: 'Macro detail of THARO metallic gold zardozi threadwork forming an avian motif on pure ivory silk',
+    name: 'Zardozi Needlework',
+    src: '/images/collection/tharo-ivory-sherwani-safaa-groom-turban.png',
+    alt: 'THARO regal groom wearing ivory silk wedding sherwani and safaa turban with emerald mala',
     note: 'Metallic thread on ivory, worked for the wedding sequence. The heaviest hand in the house.'
   },
   {
     n: '04',
-    name: 'Thread-painted floral',
-    src: '/images/craft/tharo-rose-silk-floral-resham-macro.png',
-    alt: 'Macro detail of THARO artisanal thread-painted resham floral embroidery on rose silk sleeve',
+    name: 'Thread-Painted Floral',
+    src: '/images/collection/tharo-rose-pink-silk-kurta-churidar.png',
+    alt: 'THARO rose pink silk kurta with artisanal thread-painted floral embroidery for Sangeet',
     note: 'Floral painting in thread. Colour is built in passes, the way a brush would build it.'
   }
 ];

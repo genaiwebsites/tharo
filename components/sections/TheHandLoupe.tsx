@@ -71,7 +71,7 @@ export default function TheHandLoupe() {
       return;
     }
 
-    const Z = 2.2;
+    const Z = 2.0;
     const R = 110;
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
@@ -166,7 +166,7 @@ export default function TheHandLoupe() {
                 }}
               >
                 <LoupeIcon size={14} color="#c5a880" />
-                <span>{isTouch ? 'Tap a plate to inspect macro embroidery' : 'Hover a plate to bring the loupe'}</span>
+                <span>{isTouch ? 'Tap a plate to inspect craftsmanship' : 'Hover a plate to bring the loupe'}</span>
               </div>
             </div>
           </div>
@@ -187,12 +187,13 @@ export default function TheHandLoupe() {
                   onClick={() => handleTouchClick(idx)}
                   style={{
                     position: 'relative',
-                    aspectRatio: '1/1',
+                    aspectRatio: '4/5',
                     overflow: 'hidden',
                     background: '#0e1420',
                     borderRadius: '4px',
                     cursor: isTouch ? 'zoom-in' : 'none',
                     boxShadow: '0 20px 45px rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(207, 211, 229, 0.1)',
                   }}
                 >
                   <Image
@@ -202,8 +203,9 @@ export default function TheHandLoupe() {
                     sizes="(max-width: 768px) 100vw, 50vw"
                     style={{
                       objectFit: 'cover',
-                      filter: 'saturate(.92) contrast(1.04)',
-                      transform: isTouch && zoomedIdx === idx ? 'scale(2.1)' : 'none',
+                      objectPosition: 'center 20%',
+                      filter: 'saturate(.95) contrast(1.03)',
+                      transform: isTouch && zoomedIdx === idx ? 'scale(1.25)' : 'none',
                       transition: 'transform 700ms cubic-bezier(0.16, 1, 0.3, 1)',
                     }}
                   />
@@ -212,7 +214,7 @@ export default function TheHandLoupe() {
                     style={{
                       position: 'absolute',
                       inset: 0,
-                      boxShadow: 'inset 0 0 90px rgba(6, 9, 15, 0.55)',
+                      boxShadow: 'inset 0 0 60px rgba(6, 9, 15, 0.45)',
                     }}
                   />
                 </div>
