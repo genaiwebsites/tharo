@@ -1,40 +1,83 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { LOUPE_PLATES } from '@/lib/constants';
 import { LoupeIcon } from '@/components/common/Icons';
 
 export default function TheHandLoupe() {
   const loupeRef = useRef<HTMLDivElement>(null);
+  const activePlateRef = useRef<HTMLElement | null>(null);
   const [isTouch, setIsTouch] = useState<boolean>(false);
   const [zoomedIdx, setZoomedIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const touch = window.matchMedia('(hover: none)').matches;
     setIsTouch(touch);
+
+    // Hide loupe immediately if user scrolls away or leaves window
+    const handleWindowScrollOrBlur = () => {
+      if (loupeRef.current) {
+        loupeRef.current.style.opacity = '0';
+        loupeRef.current.style.visibility = 'hidden';
+      }
+      activePlateRef.current = null;
+    };
+
+    window.addEventListener('scroll', handleWindowScrollOrBlur, { passive: true });
+    window.addEventListener('blur', handleWindowScrollOrBlur);
+    document.addEventListener('mouseleave', handleWindowScrollOrBlur);
+
+    return () => {
+      window.removeEventListener('scroll', handleWindowScrollOrBlur);
+      window.removeEventListener('blur', handleWindowScrollOrBlur);
+      document.removeEventListener('mouseleave', handleWindowScrollOrBlur);
+    };
   }, []);
 
-  const handlePointerEnter = (src: string) => {
+  const hideLoupe = useCallback(() => {
+    if (!loupeRef.current) return;
+    loupeRef.current.style.opacity = '0';
+    loupeRef.current.style.visibility = 'hidden';
+    activePlateRef.current = null;
+  }, []);
+
+  const handlePointerEnter = (e: React.PointerEvent<HTMLDivElement>, src: string) => {
     if (isTouch || !loupeRef.current) return;
+    activePlateRef.current = e.currentTarget;
     loupeRef.current.style.backgroundImage = `url(${src})`;
+    loupeRef.current.style.visibility = 'visible';
     loupeRef.current.style.opacity = '1';
   };
 
   const handlePointerLeave = () => {
-    if (isTouch || !loupeRef.current) return;
-    loupeRef.current.style.opacity = '0';
+    hideLoupe();
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isTouch || !loupeRef.current) return;
-    const Z = 2.1;
-    const R = 105;
+
     const frame = e.currentTarget;
     const r = frame.getBoundingClientRect();
+    
+    // Safety boundary check: if cursor stepped outside the bounding box, hide immediately
+    if (
+      e.clientX < r.left ||
+      e.clientX > r.right ||
+      e.clientY < r.top ||
+      e.clientY > r.bottom
+    ) {
+      hideLoupe();
+      return;
+    }
+
+    const Z = 2.2;
+    const R = 110;
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
 
+    loupeRef.current.style.visibility = 'visible';
+    loupeRef.current.style.opacity = '1';
     loupeRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
     loupeRef.current.style.backgroundSize = `${r.width * Z}px ${r.height * Z}px`;
     loupeRef.current.style.backgroundPosition = `${R - x * Z}px ${R - y * Z}px`;
@@ -50,6 +93,7 @@ export default function TheHandLoupe() {
       <section
         id="the-hand"
         data-screen-label="The Hand"
+        onPointerLeave={hideLoupe}
         style={{
           position: 'relative',
           padding: 'min(18vh, 150px) 32px min(18vh, 150px) clamp(22px, 6.5vw, 92px)',
@@ -137,7 +181,7 @@ export default function TheHandLoupe() {
             {LOUPE_PLATES.map((p, idx) => (
               <figure key={p.n} data-reveal="1" style={{ margin: 0 }}>
                 <div
-                  onPointerEnter={() => handlePointerEnter(p.src)}
+                  onPointerEnter={(e) => handlePointerEnter(e, p.src)}
                   onPointerLeave={handlePointerLeave}
                   onPointerMove={handlePointerMove}
                   onClick={() => handleTouchClick(idx)}
@@ -232,19 +276,20 @@ export default function TheHandLoupe() {
             position: 'fixed',
             top: 0,
             left: 0,
-            width: '230px',
-            height: '230px',
-            marginLeft: '-115px',
-            marginTop: '-115px',
+            width: '220px',
+            height: '220px',
+            marginLeft: '-110px',
+            marginTop: '-110px',
             borderRadius: '50%',
             pointerEvents: 'none',
-            zIndex: 80,
+            zIndex: 9999,
             border: '2px solid rgba(229, 189, 113, 0.85)',
             boxShadow:
               '0 30px 90px rgba(0, 0, 0, 0.85), inset 0 0 0 1.5px rgba(255, 70, 70, 0.3), inset 0 0 35px rgba(0, 0, 0, 0.6), 0 0 30px rgba(229, 189, 113, 0.25)',
             backgroundRepeat: 'no-repeat',
             opacity: 0,
-            transition: 'opacity 250ms ease, border-color 250ms ease',
+            visibility: 'hidden',
+            transition: 'opacity 180ms ease, visibility 180ms ease',
             willChange: 'transform, background-position',
           }}
         >
@@ -286,29 +331,6 @@ export default function TheHandLoupe() {
               boxShadow: '0 0 4px rgba(229, 189, 113, 0.6)',
             }}
           />
-
-          {/* Precision Magnification Badge */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '14px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              padding: '3px 8px',
-              borderRadius: '12px',
-              background: 'rgba(11, 15, 24, 0.85)',
-              border: '1px solid rgba(229, 189, 113, 0.5)',
-              fontSize: '8px',
-              fontWeight: 600,
-              letterSpacing: '0.22em',
-              color: '#f3f5fe',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.6)',
-            }}
-          >
-            4.8× Macro
-          </div>
         </div>
       )}
     </>

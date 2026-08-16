@@ -100,23 +100,29 @@ export default function Home() {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const thresholdEl = document.getElementById('threshold');
+          const meaningEl = document.getElementById('meaning');
           const vh = window.innerHeight;
 
+          let triggerY = 0;
           if (thresholdEl) {
-            const heroEnd = thresholdEl.offsetTop + thresholdEl.offsetHeight;
+            const span = Math.max(1, thresholdEl.offsetHeight - vh);
+            triggerY = thresholdEl.offsetTop + span * 0.80;
+          } else if (meaningEl) {
+            triggerY = meaningEl.offsetTop;
+          }
+
+          // Immediately start threadline from Hero Beat 3 ending
+          const hasPassedHeroBeat3 = window.scrollY >= triggerY;
+          setIsHeroPassed((prev) => (prev !== hasPassedHeroBeat3 ? hasPassedHeroBeat3 : prev));
+
+          if (hasPassedHeroBeat3) {
             const totalHeight = document.documentElement.scrollHeight - vh;
-
-            const hasPassedHero = window.scrollY >= heroEnd - 10;
-            setIsHeroPassed((prev) => (prev !== hasPassedHero ? hasPassedHero : prev));
-
-            if (hasPassedHero) {
-              const remainingSpan = Math.max(1, totalHeight - heroEnd);
-              const relativeScroll = Math.max(0, window.scrollY - heroEnd);
-              const tProg = Math.min(1, Math.max(0, relativeScroll / remainingSpan));
-              setThreadProgress((prev) => (Math.abs(prev - tProg) > 0.001 ? tProg : prev));
-            } else {
-              setThreadProgress((prev) => (prev !== 0 ? 0 : prev));
-            }
+            const totalSpan = Math.max(1, totalHeight - triggerY);
+            const relativeScroll = Math.max(0, window.scrollY - triggerY);
+            const tProg = Math.min(1, Math.max(0, relativeScroll / totalSpan));
+            setThreadProgress((prev) => (Math.abs(prev - tProg) > 0.001 ? tProg : prev));
+          } else {
+            setThreadProgress((prev) => (prev !== 0 ? 0 : prev));
           }
 
           applyTemperature();

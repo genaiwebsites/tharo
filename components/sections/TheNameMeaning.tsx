@@ -99,18 +99,21 @@ export default function TheNameMeaning() {
                 position: 'relative',
                 aspectRatio: '4/5',
                 overflow: 'hidden',
-                background: '#131b29'
+                borderRadius: '4px',
+                background: '#131b29',
+                border: '1px solid rgba(207, 211, 229, 0.16)',
+                boxShadow: '0 30px 80px rgba(0, 0, 0, 0.7), 0 0 35px rgba(207, 211, 229, 0.08)',
               }}
             >
               <Image
-                src="/images/macro_cornelli.png"
-                alt="Silver cornelli soutache embroidery running across the shoulder of a black jacket, Blue Room"
+                src="/images/navy_suit_shoulder.png"
+                alt="Silver cornelli soutache hand-embroidery across the shoulder of bespoke Tharo navy tailoring"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{
                   objectFit: 'cover',
-                  objectPosition: '22% 40%',
-                  filter: 'saturate(.86) contrast(1.04)'
+                  objectPosition: 'center',
+                  filter: 'contrast(1.02) brightness(0.98)',
                 }}
               />
               <div
@@ -118,21 +121,24 @@ export default function TheNameMeaning() {
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'var(--grade)',
-                  mixBlendMode: 'multiply'
+                  background: 'linear-gradient(180deg, transparent 65%, rgba(11, 15, 24, 0.6) 100%)',
                 }}
               />
             </div>
             <figcaption
               style={{
                 marginTop: '14px',
-                fontSize: '11.5px',
-                letterSpacing: '0.14em',
+                fontSize: '11px',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: '#75798c'
+                color: '#8a90a2',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
             >
-              Cornelli, worked by hand · Blue Room
+              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#c5a880' }} />
+              <span>Silver Cornelli Hand-Work · The Blue Room</span>
             </figcaption>
           </figure>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { CHAPTERS } from '@/lib/constants';
 
 interface TheThreadProps {
@@ -19,6 +19,8 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
   const badgeRef = useRef<HTMLDivElement>(null);
   const badgeRomanRef = useRef<HTMLSpanElement>(null);
   const badgeLabelRef = useRef<HTMLSpanElement>(null);
+
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const knotsRef = useRef<
     Array<{
@@ -52,9 +54,9 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
     return { x, y, angle };
   };
 
-  const [dCord, setDCord] = React.useState<string>('');
-  const [dCouching, setDCouching] = React.useState<string>('');
-  const [chapterList, setChapterList] = React.useState<
+  const [dCord, setDCord] = useState<string>('');
+  const [dCouching, setDCouching] = useState<string>('');
+  const [chapterList, setChapterList] = useState<
     Array<{ id: string; label: string; roman: string; x: number; y: number }>
   >([]);
 
@@ -63,7 +65,7 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       const H = Math.max(500, window.innerHeight);
       const { cx, amp, wavelength } = geometry;
 
-      // 1. Cord path from 0 to H
+      // 1. Continuous cord path from 0 to H
       let cordStr = `M ${cx} 0`;
       const half = wavelength / 2;
 
@@ -97,8 +99,17 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       }
 
       // 3. Measure chapter knot milestones
+      const thresholdEl = document.getElementById('threshold');
       const meaningEl = document.getElementById('meaning');
-      const startY = meaningEl ? meaningEl.offsetTop : 0;
+
+      let startY = 0;
+      if (thresholdEl) {
+        const span = Math.max(1, thresholdEl.offsetHeight - H);
+        startY = thresholdEl.offsetTop + span * 0.80;
+      } else if (meaningEl) {
+        startY = meaningEl.offsetTop;
+      }
+
       const docHeight = document.documentElement.scrollHeight;
       const totalSpan = Math.max(1, docHeight - startY - window.innerHeight);
 
@@ -149,8 +160,9 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
     const yPos = topY + clampedProg * usableSpan;
     const pt = getPointAtY(yPos);
 
+    // Thread is physically and seamlessly drawn exactly up to needle position with 0 gap
     if (clipRectRef.current) {
-      clipRectRef.current.setAttribute('height', `${Math.max(0, yPos + 2)}`);
+      clipRectRef.current.setAttribute('height', `${Math.max(0, yPos + 4)}`);
     }
 
     if (needleGroupRef.current) {
@@ -158,14 +170,6 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
         'transform',
         `translate(${pt.x.toFixed(1)}, ${pt.y.toFixed(1)}) rotate(${pt.angle.toFixed(1)})`
       );
-    }
-
-    const offset = 1000 * (1 - clampedProg);
-    if (activePathRef.current) {
-      activePathRef.current.style.strokeDashoffset = `${offset.toFixed(1)}`;
-    }
-    if (shadowPathRef.current) {
-      shadowPathRef.current.style.strokeDashoffset = `${offset.toFixed(1)}`;
     }
 
     // Update chapter knots directly
@@ -196,14 +200,17 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
       ref={containerRef}
       id="thread-rail"
       aria-label="Reading stitch progress indicator"
+      onPointerEnter={() => setIsHovered(true)}
+      onPointerLeave={() => setIsHovered(false)}
       style={{
         position: 'fixed',
         left: 0,
         top: 0,
         bottom: 0,
-        width: '72px',
+        width: '80px',
         zIndex: 50,
-        pointerEvents: 'none',
+        pointerEvents: 'auto',
+        cursor: 'default',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateX(0)' : 'translateX(-28px)',
         transition:
@@ -249,13 +256,13 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
             </feMerge>
           </filter>
 
-          {/* Strict ClipPath: Ensures EVERYTHING only exists up to current needle Y */}
+          {/* Strict ClipPath: Ensures EVERYTHING draws seamlessly up to current needle Y with zero lag */}
           <clipPath id="thread-scrolled-clip">
             <rect ref={clipRectRef} x="0" y="0" width="100" height="24" />
           </clipPath>
         </defs>
 
-        {/* Group clipped strictly to current scroll position so NOTHING leaks below */}
+        {/* Group clipped strictly to current needle scroll position so thread directly enters needle eye */}
         <g clipPath="url(#thread-scrolled-clip)">
           {/* 1. Fabric Shadow of the active cord */}
           <path
@@ -267,9 +274,6 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
             strokeLinecap="round"
             strokeLinejoin="round"
             opacity="0.6"
-            pathLength={1000}
-            strokeDasharray="1000"
-            strokeDashoffset="1000"
             vectorEffect="non-scaling-stroke"
           />
 
@@ -294,16 +298,13 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
             strokeLinecap="round"
             strokeLinejoin="round"
             filter="url(#soft-thread-glow)"
-            pathLength={1000}
-            strokeDasharray="1000"
-            strokeDashoffset="1000"
             vectorEffect="non-scaling-stroke"
           />
         </g>
 
         {/* 4. Chapter Tension Eyelets */}
         {chapterList.map((k, idx) => (
-          <g key={k.id} className="chapter-eyelet">
+          <g key={k.id} className="chapter-eyelet" style={{ cursor: 'pointer' }}>
             {/* Outer Ring */}
             <circle
               ref={(el) => {
@@ -366,14 +367,14 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
         </g>
       </svg>
 
-      {/* 6. Floating Chapter Indicator Badge */}
+      {/* 6. Floating Chapter Indicator Badge: Only shown on hover to keep UI clean and uncluttered */}
       <div
         ref={badgeRef}
         style={{
           position: 'absolute',
           left: '48px',
           top: '24px',
-          transform: 'translateY(-50%)',
+          transform: isHovered ? 'translateY(-50%) translateX(0)' : 'translateY(-50%) translateX(-6px)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -385,9 +386,9 @@ export default function TheThread({ visible, scrollProgress }: TheThreadProps) {
           border: '1px solid rgba(207, 211, 229, 0.24)',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.65), 0 0 12px rgba(207, 211, 229, 0.08)',
           whiteSpace: 'nowrap',
-          pointerEvents: 'auto',
-          opacity: visible ? 1 : 0,
-          transition: 'opacity 300ms ease',
+          pointerEvents: isHovered ? 'auto' : 'none',
+          opacity: visible && isHovered ? 1 : 0,
+          transition: 'opacity 220ms cubic-bezier(0.16, 1, 0.3, 1), transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {/* Connecting Hairline Lead from Knot */}
