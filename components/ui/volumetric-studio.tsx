@@ -1,15 +1,200 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { SpotLight } from '@react-three/drei';
+import * as THREE from 'three';
 import { cn } from '@/lib/utils';
 
 const METAL_NOISE =
   'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%221.5%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E")';
 const GRAIN_NOISE =
   'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22g%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23g)%22/%3E%3C/svg%3E")';
+
+// Ultra-realistic Silky 2D Canvas Atmospheric Bokeh & Floating Dust Particles
+function SilkyCanvasAtmosphericDust({
+  lightsOn,
+  lightColor,
+}: {
+  lightsOn: boolean;
+  lightColor: string;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    const particles = Array.from({ length: 48 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 2.2 + 0.8,
+      speedY: -(Math.random() * 0.35 + 0.15),
+      speedX: (Math.random() - 0.5) * 0.25,
+      opacity: Math.random() * 0.4 + 0.18,
+      pulse: Math.random() * Math.PI * 2,
+    }));
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      if (lightsOn) {
+        particles.forEach((p) => {
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.pulse += 0.025;
+
+          if (p.y < -10) {
+            p.y = height + 10;
+            p.x = Math.random() * width;
+          }
+          if (p.x < -10) p.x = width + 10;
+          if (p.x > width + 10) p.x = -10;
+
+          const currentOpacity = p.opacity * (0.75 + Math.sin(p.pulse) * 0.25);
+
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2.4);
+          grad.addColorStop(0, `rgba(${lightColor}, ${currentOpacity * 1.6})`);
+          grad.addColorStop(0.35, `rgba(${lightColor}, ${currentOpacity * 0.7})`);
+          grad.addColorStop(1, `rgba(${lightColor}, 0)`);
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius * 2.4, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [lightsOn, lightColor]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 22,
+        pointerEvents: 'none',
+        mixBlendMode: 'screen',
+        opacity: lightsOn ? 0.95 : 0,
+        transition: 'opacity 800ms ease',
+      }}
+    />
+  );
+}
+
+// 3D Volumetric Spotlight Beam with Motorized Ray Tracking Physics
+function RayTrackedSpotlight({
+  color,
+  isCenter = false,
+  lightsOn,
+  intensity,
+  mousePos,
+  isFollowMode = false,
+  inwardAim = 0,
+}: {
+  color: string;
+  isCenter?: boolean;
+  lightsOn: boolean;
+  intensity: number;
+  mousePos: { x: number; y: number };
+  isFollowMode?: boolean;
+  inwardAim?: number;
+}) {
+  const spotRef = useRef<THREE.SpotLight>(null);
+  const targetObj = useMemo(() => new THREE.Object3D(), []);
+  const currentPos = useRef(new THREE.Vector3(inwardAim, -3.4, 0));
+
+  useFrame((state, delta) => {
+    const t = state.clock.getElapsedTime();
+    const mx = mousePos.x;
+    const my = mousePos.y;
+
+    let destX = inwardAim;
+    let destY = -3.4;
+
+    if (isCenter) {
+      if (isFollowMode) {
+        // Smooth continuous ray tracking following the user's cursor
+        destX = mx * 1.8;
+        destY = -3.4 - my * 0.45;
+      } else {
+        // Natural resting idle center with subtle organic breath
+        destX = Math.sin(t * 0.4) * 0.12;
+        destY = -3.4 + Math.cos(t * 0.3) * 0.06;
+      }
+    } else {
+      // Side rim spotlights aim inward toward the central runway model
+      destX = inwardAim + (isFollowMode ? mx * 0.4 : Math.sin(t * 0.4) * 0.1);
+      destY = -3.4;
+    }
+
+    currentPos.current.x = THREE.MathUtils.damp(currentPos.current.x, destX, 7, delta);
+    currentPos.current.y = THREE.MathUtils.damp(currentPos.current.y, destY, 7, delta);
+    currentPos.current.z = THREE.MathUtils.damp(currentPos.current.z, 0, 7, delta);
+
+    targetObj.position.copy(currentPos.current);
+    targetObj.updateMatrixWorld();
+
+    if (spotRef.current) {
+      spotRef.current.target = targetObj;
+      const targetIntensity = lightsOn
+        ? intensity * (isCenter ? 1.25 : 0.8) * (0.97 + Math.sin(t * 2.0) * 0.03)
+        : 0;
+      spotRef.current.intensity = THREE.MathUtils.lerp(
+        spotRef.current.intensity,
+        targetIntensity,
+        0.1
+      );
+    }
+  });
+
+  return (
+    <>
+      <primitive object={targetObj} />
+      <ambientLight intensity={0.4} />
+      <SpotLight
+        ref={spotRef}
+        target={targetObj}
+        position={[0, 4.1, 0]}
+        color={color.includes(',') ? `rgb(${color})` : color}
+        distance={16}
+        angle={isCenter ? 0.36 : 0.28}
+        attenuation={isCenter ? 3.8 : 5.0}
+        anglePower={isCenter ? 3.6 : 4.6}
+        volumetric
+        opacity={lightsOn ? (isCenter ? 1.0 : 0.75) : 0}
+        radiusTop={0.1}
+        radiusBottom={isCenter ? 5.6 : 3.8}
+      />
+    </>
+  );
+}
 
 export type RoomProps = {
   backWall?: {
@@ -43,6 +228,8 @@ export function StudioRoom({
   vignette = 0.55,
   isFlickering = false,
   className = '',
+  mousePos = { x: 0, y: 0 },
+  isFollowMode = true,
 }: RoomProps) {
   const { tl, tr, br, bl } = backWall;
   const poly = useMemo(
@@ -85,7 +272,7 @@ export function StudioRoom({
           background: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 100%)',
         }}
       />
-      {/* Left Wall */}
+      {/* Left Perspective Wall */}
       <div
         style={{
           position: 'absolute',
@@ -94,7 +281,7 @@ export function StudioRoom({
           background: 'linear-gradient(to right, rgba(8,8,10,1) 0%, rgba(18,18,20,1) 70%, rgba(26,26,28,1) 100%)',
         }}
       />
-      {/* Right Wall */}
+      {/* Right Perspective Wall */}
       <div
         style={{
           position: 'absolute',
@@ -103,7 +290,7 @@ export function StudioRoom({
           background: 'linear-gradient(to left, rgba(8,8,10,1) 0%, rgba(18,18,20,1) 70%, rgba(26,26,28,1) 100%)',
         }}
       />
-      {/* Floor */}
+      {/* Runway Floor Plane */}
       <div
         style={{
           position: 'absolute',
@@ -163,7 +350,7 @@ export function StudioRoom({
         />
       </svg>
 
-      {/* Light Pools on walls and floor */}
+      {/* Realistic Floor Light Contact Pools & Specular Bounce */}
       <div
         style={{
           position: 'absolute',
@@ -176,6 +363,7 @@ export function StudioRoom({
           willChange: 'opacity',
         }}
       >
+        {/* Back Wall Light Diffusions */}
         <div
           style={{
             position: 'absolute',
@@ -189,6 +377,7 @@ export function StudioRoom({
               .join(', '),
           }}
         />
+        {/* Left Side Wall Reflection */}
         <div
           style={{
             position: 'absolute',
@@ -197,6 +386,7 @@ export function StudioRoom({
             background: `radial-gradient(ellipse 40% 50% at 15% 75%, rgba(${rawRgb},0.08) 0%, transparent 60%)`,
           }}
         />
+        {/* Right Side Wall Reflection */}
         <div
           style={{
             position: 'absolute',
@@ -205,22 +395,37 @@ export function StudioRoom({
             background: `radial-gradient(ellipse 40% 50% at 85% 75%, rgba(${rawRgb},0.08) 0%, transparent 60%)`,
           }}
         />
+
+        {/* Dynamic Center Floor Podium Light Pool (Tracks with Follow-Spot Ray Tracking) */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             clipPath: poly([[0, 100], [100, 100], br, bl]),
-            background: spots
+            background: `radial-gradient(ellipse 42% 32% at ${50 + (isFollowMode ? mousePos.x * 2.2 : 0)}% 78%, rgba(${rawRgb},0.42) 0%, rgba(${rawRgb},0.12) 48%, transparent 75%)`,
+            transition: 'background 200ms ease',
+          }}
+        />
+        {/* Left and Right Floor Footprints */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            clipPath: poly([[0, 100], [100, 100], br, bl]),
+            background: [
+              { x: 35, offset: 2 },
+              { x: 65, offset: -2 },
+            ]
               .map(
-                (x) =>
-                  `radial-gradient(ellipse 35% 30% at ${x}% 80%, rgba(${rawRgb},0.06) 0%, transparent 60%)`
+                (p) =>
+                  `radial-gradient(ellipse 30% 24% at ${p.x + p.offset}% 78%, rgba(${rawRgb},0.18) 0%, transparent 60%)`
               )
               .join(', '),
           }}
         />
       </div>
 
-      {/* 3D Volumetric Spotlight Beams */}
+      {/* 3D Volumetric Spotlight Beams with Ray Tracking */}
       <div
         style={{
           position: 'absolute',
@@ -230,51 +435,52 @@ export function StudioRoom({
           mixBlendMode: 'screen',
         }}
       >
-        {spots.map((pos, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: lightsOn ? intensity : 0 }}
-            transition={
-              isFlickering
-                ? { duration: 0 }
-                : { delay: i * 0.1, duration: 0.8, ease: 'easeInOut' }
-            }
-            style={{
-              position: 'absolute',
-              display: 'flex',
-              width: '280px',
-              height: '80vh',
-              transform: 'translateX(-50%)',
-              justifyContent: 'center',
-              pointerEvents: 'none',
-              left: `${pos}%`,
-              top: 'calc(3% + 80px)',
-              mixBlendMode: 'screen',
-              willChange: 'opacity',
-            }}
-          >
-            <Canvas
-              camera={{ position: [0, 0, 10], fov: 45 }}
-              shadows={false}
-              gl={{ alpha: true }}
+        {spots.map((pos, i) => {
+          const isCenter = pos === 50;
+          const inwardAim = isCenter ? 0 : (pos < 50 ? 0.6 : -0.6);
+
+          return (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: lightsOn ? intensity : 0 }}
+              transition={
+                isFlickering
+                  ? { duration: 0 }
+                  : { delay: i * 0.1, duration: 0.8, ease: 'easeInOut' }
+              }
+              style={{
+                position: 'absolute',
+                display: 'flex',
+                width: '320px',
+                height: '80vh',
+                transform: 'translateX(-50%)',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+                left: `${pos}%`,
+                top: 'calc(3% + 80px)',
+                mixBlendMode: 'screen',
+                willChange: 'opacity',
+              }}
             >
-              <ambientLight intensity={0.5} />
-              <SpotLight
-                distance={12}
-                angle={0.28}
-                attenuation={5.2}
-                anglePower={4.5}
-                color={formattedColor}
-                position={[0, 4.1, 0]}
-                volumetric
-                opacity={1}
-                radiusTop={0.1}
-                radiusBottom={4}
-              />
-            </Canvas>
-          </motion.div>
-        ))}
+              <Canvas
+                camera={{ position: [0, 0, 10], fov: 45 }}
+                shadows={false}
+                gl={{ alpha: true }}
+              >
+                <RayTrackedSpotlight
+                  color={formattedColor}
+                  isCenter={isCenter}
+                  lightsOn={lightsOn}
+                  intensity={intensity}
+                  mousePos={mousePos}
+                  isFollowMode={isFollowMode}
+                  inwardAim={inwardAim}
+                />
+              </Canvas>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* 1:1 Original 21st.dev Theatrical Fixture Lamps with Barn Doors */}
@@ -558,6 +764,9 @@ export function StudioRoom({
         ))}
       </div>
 
+      {/* Silky 2D Atmospheric Bokeh Motes */}
+      <SilkyCanvasAtmosphericDust lightsOn={lightsOn} lightColor={rawRgb} />
+
       {/* Ceiling Rig Bar Shadow Blur */}
       <div
         style={{
@@ -643,6 +852,8 @@ export const VolumetricStudio = ({
   lightColor = '230,240,255',
   spots = [35, 50, 65],
   intensity = 1,
+  mousePos = { x: 0, y: 0 },
+  isFollowMode = true,
 }: {
   className?: string;
   style?: React.CSSProperties;
@@ -707,6 +918,8 @@ export const VolumetricStudio = ({
         lightColor={lightColor}
         spots={spots}
         isFlickering={isFlickering}
+        mousePos={mousePos}
+        isFollowMode={isFollowMode}
       />
       <div style={{ position: 'relative', zIndex: 35, width: '100%', height: '100%' }}>
         {children}

@@ -300,34 +300,7 @@ export default function VolumetricAtelierStudio() {
                 justifyContent: 'center',
               }}
             >
-              {/* Floor Light Disc under Model Feet */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '-12px',
-                  width: '420px',
-                  height: '46px',
-                  borderRadius: '50%',
-                  background: `radial-gradient(ellipse, rgba(${activeMood.color}, 0.5) 0%, rgba(${activeMood.color}, 0.1) 48%, transparent 76%)`,
-                  filter: 'blur(12px)',
-                  transition: 'background 500ms ease',
-                }}
-              />
-
-              {/* Contact Shoe Shadow */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '-1px',
-                  width: '180px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  background: 'rgba(0, 0, 0, 0.9)',
-                  filter: 'blur(4px)',
-                }}
-              />
-
-              {/* Human Cutout Models - Perfectly Stable & Still */}
+              {/* Human Cutout Models - Clean & Sharp Feet on Stage Floor */}
               {ATELIER_COLLECTION.map((look, index) => {
                 const isSelected = activeLookIndex === index;
                 return (
@@ -354,7 +327,6 @@ export default function VolumetricAtelierStudio() {
                       style={{
                         objectFit: 'contain',
                         objectPosition: 'bottom center',
-                        filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.95))',
                       }}
                       priority={index === 0}
                     />
