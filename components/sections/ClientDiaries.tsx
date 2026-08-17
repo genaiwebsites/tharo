@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { CLIENT_DIARIES } from '@/lib/constants';
+import { SectionScrim } from '@/components/common/SectionScrim';
 
 export default function ClientDiaries() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -39,6 +40,7 @@ export default function ClientDiaries() {
         overflow: 'hidden'
       }}
     >
+      <SectionScrim />
       <div
         style={{
           padding: '0 32px 0 clamp(22px, 6.5vw, 92px)',

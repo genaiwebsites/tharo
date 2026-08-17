@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { RAIL_ITEMS } from '@/lib/constants';
+import { SectionScrim } from '@/components/common/SectionScrim';
 
 export default function TheRail() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -81,6 +82,7 @@ export default function TheRail() {
         padding: 'min(14vh, 120px) 0 min(14vh, 120px)'
       }}
     >
+      <SectionScrim />
       <div
         style={{
           padding: '0 32px 0 clamp(22px, 6.5vw, 92px)',

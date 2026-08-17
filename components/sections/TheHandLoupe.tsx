@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
+import { SectionScrim } from '@/components/common/SectionScrim';
 import { LOUPE_PLATES } from '@/lib/constants';
 import { LoupeIcon } from '@/components/common/Icons';
 
@@ -98,9 +99,10 @@ export default function TheHandLoupe() {
           position: 'relative',
           padding: 'min(18vh, 150px) 32px min(18vh, 150px) clamp(22px, 6.5vw, 92px)',
           background:
-            'linear-gradient(180deg, rgba(6, 9, 15, 0), rgba(6, 9, 15, 0.85) 12%, rgba(6, 9, 15, 0.85) 88%, rgba(6, 9, 15, 0))',
+            'linear-gradient(180deg, #0b0f18 0%, #08090f 10%, #08090f 90%, #0b0f18 100%)',
         }}
       >
+        <SectionScrim />
         <div style={{ maxWidth: '1320px', margin: '0 auto' }}>
           <div
             style={{

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { SectionScrim } from '@/components/common/SectionScrim';
 
 export default function BlueRoom() {
   return (
@@ -13,6 +14,7 @@ export default function BlueRoom() {
         padding: 'min(16vh, 140px) 32px min(14vh, 120px) clamp(22px, 6.5vw, 92px)'
       }}
     >
+      <SectionScrim />
       <div style={{ maxWidth: '1320px', margin: '0 auto' }}>
         <div
           style={{

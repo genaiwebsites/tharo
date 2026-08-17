@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { FITTING_STAGES } from '@/lib/constants';
 import { TapeMeasureIcon, ShearsIcon, NeedleThreadIcon } from '@/components/common/Icons';
+import { SectionScrim } from '@/components/common/SectionScrim';
 
 export default function TheFitting() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -133,7 +134,7 @@ export default function TheFitting() {
         style={{
           position: 'relative',
           height: '460vh',
-          background: 'linear-gradient(180deg, rgba(6, 9, 15, 0.4) 0%, rgba(9, 13, 21, 0.95) 15%, rgba(9, 13, 21, 0.95) 85%, rgba(6, 9, 15, 0.4) 100%)',
+          background: 'linear-gradient(180deg, #0b0f18 0%, #090d15 8%, #090d15 92%, #0b0f18 100%)',
         }}
       >
         <div
@@ -147,6 +148,7 @@ export default function TheFitting() {
             justifyContent: 'center',
           }}
         >
+          <SectionScrim height={120} zIndex={10} />
           {/* Section Masthead */}
           <div
             style={{

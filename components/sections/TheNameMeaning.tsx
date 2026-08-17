@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { SectionScrim } from '@/components/common/SectionScrim';
 
 export default function TheNameMeaning() {
   return (
@@ -14,6 +15,7 @@ export default function TheNameMeaning() {
           padding: 'min(20vh, 180px) 32px min(18vh, 150px) clamp(22px, 6.5vw, 92px)'
         }}
       >
+        <SectionScrim />
         <div
           style={{
             maxWidth: '1180px',

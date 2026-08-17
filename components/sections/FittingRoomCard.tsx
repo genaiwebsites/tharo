@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { OCCASION_OPTIONS } from '@/lib/constants';
 import { StorePinIcon } from '@/components/common/Icons';
+import { SectionScrim } from '@/components/common/SectionScrim';
 
 export default function FittingRoomCard() {
   const [occasion, setOccasion] = useState<string>('Wedding');
@@ -79,6 +80,7 @@ export default function FittingRoomCard() {
         background: 'radial-gradient(90% 70% at 50% 30%, rgba(20, 26, 40, 0.4) 0%, transparent 80%)',
       }}
     >
+      <SectionScrim />
       <div
         style={{
           maxWidth: '1320px',

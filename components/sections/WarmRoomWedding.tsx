@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { OCCASIONS } from '@/lib/constants';
 import { SunHaldiIcon, BloomSangeetIcon, CrownWeddingIcon, SashReceptionIcon } from '@/components/common/Icons';
+import { SectionScrim } from '@/components/common/SectionScrim';
 
 interface WarmRoomWeddingProps {
   onOccasionChange?: (occasionId: string) => void;
@@ -47,6 +48,7 @@ export default function WarmRoomWedding({ onOccasionChange }: WarmRoomWeddingPro
         padding: 'min(18vh, 150px) 32px min(18vh, 150px) clamp(22px, 6.5vw, 92px)',
       }}
     >
+      <SectionScrim />
       <div
         aria-hidden="true"
         style={{
