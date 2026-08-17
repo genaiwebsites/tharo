@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { StoreStatus } from '@/lib/types';
 import { SectionScrim } from '@/components/common/SectionScrim';
+import Silk from '@/components/ui/Silk';
 
 interface HeroThresholdProps {
   storeStatus: StoreStatus;
@@ -19,14 +20,16 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
   const targetFrameRef = useRef<number>(0);
   const lastDrawnFrameRef = useRef<number>(-1);
 
-  const veilRef = useRef<HTMLDivElement>(null);
+  const silkWrapperRef = useRef<HTMLDivElement>(null);
   const beat1Ref = useRef<HTMLDivElement>(null);
   const beat2Ref = useRef<HTMLDivElement>(null);
   const beat3Ref = useRef<HTMLDivElement>(null);
   const heroSideRef = useRef<HTMLDivElement>(null);
+  const sideTicksRef = useRef<HTMLDivElement>(null);
   const heroFootRef = useRef<HTMLDivElement>(null);
 
   const [activeTick, setActiveTick] = useState<number>(0);
+  const [isSilkPaused, setIsSilkPaused] = useState<boolean>(false);
 
   // 1. Crystal-Clear Canvas Render Function
   const renderFrame = useCallback((frameIdx: number) => {
@@ -115,9 +118,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
       if (isCancelled) return;
       try {
         if ('decode' in img0) await img0.decode();
-      } catch {
-        // ignore decode errors
-      }
+      } catch {}
       imagesRef.current[0] = img0;
       renderFrame(0);
     };
@@ -180,7 +181,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
 
     const tick = () => {
       const diff = targetFrameRef.current - currentFrameRef.current;
-      if (Math.abs(diff) > 0.01) {
+      if (Math.abs(diff) > 0.005) {
         currentFrameRef.current += diff * 0.22;
         const targetInt = Math.round(currentFrameRef.current);
         if (targetInt !== lastDrawnFrameRef.current) {
@@ -194,7 +195,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
     return () => cancelAnimationFrame(animId);
   }, [renderFrame]);
 
-  // 5. Scroll Sync & Glassmorphism Reveal Transitions
+  // 5. Scroll Sync & React Bits Silk Reveal Transitions
   useEffect(() => {
     const handleScroll = () => {
       const s = sectionRef.current;
@@ -209,13 +210,16 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
       const seg = (a: number, b: number) => cl((p - a) / (b - a));
       const ez = (t: number) => t * t * (3 - 2 * t);
 
-      // Glassmorphism Veil Reveal (Dissolves from p = 0 to 0.16)
-      const veilFade = ez(seg(0.0, 0.16));
-      if (veilRef.current) {
-        veilRef.current.style.opacity = (1 - veilFade).toFixed(3);
-        veilRef.current.style.backdropFilter = `blur(${(28 * (1 - veilFade)).toFixed(1)}px)`;
-        veilRef.current.style.visibility = veilFade > 0.99 ? 'hidden' : 'visible';
+      // React Bits Silk Fluid Reveal (Dissolves from p = 0 to 0.18)
+      const silkFade = ez(seg(0.0, 0.18));
+      if (silkWrapperRef.current) {
+        silkWrapperRef.current.style.opacity = (1 - silkFade).toFixed(3);
+        silkWrapperRef.current.style.transform = `scale(${(1 + silkFade * 0.06).toFixed(3)})`;
+        silkWrapperRef.current.style.visibility = silkFade > 0.99 ? 'hidden' : 'visible';
       }
+
+      // Pause Silk WebGL renderer if scrolled past hero veil to conserve 100% GPU
+      setIsSilkPaused(p > 0.22);
 
       // Beat 1: Monumental Logo & Salutation (Visible at start, gently lifts and clears as storefront opens)
       const b1Out = ez(seg(0.04, 0.22));
@@ -248,10 +252,21 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
         heroSideRef.current.style.opacity = (Math.max(in2 - out2, in3) * 0.95).toFixed(3);
       }
 
+      // Hide side ticks on initial silk screen (Beat 1), reveal only when entering store (Beat 2 & 3)
+      if (sideTicksRef.current) {
+        const ticksIn = ez(seg(0.18, 0.32));
+        sideTicksRef.current.style.opacity = ticksIn.toFixed(3);
+        sideTicksRef.current.style.pointerEvents = ticksIn > 0.5 ? 'auto' : 'none';
+        sideTicksRef.current.style.transform = `translateY(${((1 - ticksIn) * 14).toFixed(1)}px)`;
+      }
+
+      // Basting Needle Scroll Cue (Smoothly fades out on initial scroll)
       if (heroFootRef.current) {
-        const fo = 1 - ez(seg(0.02, 0.14));
+        const fo = 1 - ez(seg(0.02, 0.12));
         heroFootRef.current.style.opacity = fo.toFixed(3);
+        heroFootRef.current.style.transform = `translateY(${(ez(seg(0.0, 0.12)) * 18).toFixed(1)}px)`;
         heroFootRef.current.style.visibility = fo > 0.02 ? 'visible' : 'hidden';
+        heroFootRef.current.style.pointerEvents = fo > 0.4 ? 'auto' : 'none';
       }
 
       // Ticks navigation
@@ -266,6 +281,13 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const handleScrollCueClick = () => {
+    window.scrollTo({
+      top: window.innerHeight * 1.25,
+      behavior: 'smooth',
+    });
+  };
 
   return (
     <section
@@ -293,25 +315,40 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
           }}
         />
 
-        {/* Initial High-Suspense Frosted Glassmorphism Veil (Smoothly dissolves on initial scroll) */}
+        {/* React Bits Silk Fabric Veil (Official ReactBits WebGL Shader) */}
         <div
-          ref={veilRef}
+          ref={silkWrapperRef}
           aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
             zIndex: 3,
             pointerEvents: 'none',
-            background:
-              'radial-gradient(ellipse at center, rgba(11, 15, 24, 0.72) 0%, rgba(11, 15, 24, 0.88) 100%)',
-            backdropFilter: 'blur(28px)',
-            WebkitBackdropFilter: 'blur(28px)',
-            transition: 'opacity 150ms ease-out',
-            willChange: 'opacity, backdrop-filter',
+            background: '#0b0f18',
+            transition: 'opacity 250ms ease-out, transform 250ms ease-out',
+            willChange: 'opacity, transform',
           }}
-        />
+        >
+          <Silk
+            speed={6.2}
+            scale={1.1}
+            color="#14438e"
+            noiseIntensity={0.2}
+            rotation={4.7}
+            paused={isSilkPaused}
+          />
+          {/* Soft Editorial Vignette Gradient to preserve silk luster & text readability */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background:
+                'radial-gradient(ellipse 90% 75% at 50% 50%, rgba(11, 15, 24, 0.2) 0%, rgba(11, 15, 24, 0.65) 100%)',
+            }}
+          />
+        </div>
 
-        {/* Ambient Edge Vignette (Clean cinematic luxury frame, no mouse hover glitches) */}
+        {/* Ambient Edge Vignette (Clean cinematic luxury frame) */}
         <div
           aria-hidden="true"
           style={{
@@ -366,25 +403,6 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
             <div>
               <p className="devanagari-3d-metallic">खम्मा घणी</p>
             </div>
-
-            {/* 3D Atmospheric Aura Glow */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                left: '50%',
-                top: '52%',
-                width: '140%',
-                height: '180%',
-                transform: 'translate(-50%, -50%)',
-                pointerEvents: 'none',
-                zIndex: -1,
-                background:
-                  'radial-gradient(ellipse 65% 45% at 50% 50%, rgba(207, 211, 229, 0.2) 0%, rgba(197, 168, 128, 0.12) 45%, transparent 75%)',
-                filter: 'blur(34px)',
-                animation: 'hero-glow-pulse 5s ease-in-out infinite',
-              }}
-            />
 
             {/* Authentic Brand Wordmark with Infinitely Running 3D Metallic Shimmer */}
             <h1
@@ -581,8 +599,9 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
           </div>
         </div>
 
-        {/* Right Side Journey Progress Ticks */}
+        {/* Right Side Journey Progress Ticks (Revealed on Beat 2 & 3) */}
         <div
+          ref={sideTicksRef}
           aria-hidden="true"
           style={{
             position: 'absolute',
@@ -594,6 +613,9 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
             flexDirection: 'column',
             alignItems: 'flex-end',
             gap: '16px',
+            opacity: 0,
+            pointerEvents: 'none',
+            transition: 'opacity 400ms ease, transform 400ms ease',
           }}
         >
           {[
@@ -637,7 +659,7 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
           ))}
         </div>
 
-        {/* Hero Footer: Clean Luxury Scroll Cue */}
+        {/* Option 1: The Golden Basting Needle & Zari Thread (सुई-धागा) Interactive Scroll Cue */}
         <div
           ref={heroFootRef}
           style={{
@@ -647,58 +669,114 @@ export default function HeroThreshold({ storeStatus }: HeroThresholdProps) {
             bottom: 0,
             zIndex: 15,
             display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            padding: '0 clamp(22px, 6.5vw, 92px) 34px',
-            transition: 'opacity 400ms ease',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingBottom: '28px',
+            transition: 'opacity 300ms ease, transform 300ms ease',
           }}
         >
-          {/* Atelier Status */}
-          <div
+          <button
+            type="button"
+            onClick={handleScrollCueClick}
+            aria-label="Unveil Atelier"
             style={{
-              fontSize: '11px',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#c5a880',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               gap: '8px',
+              padding: '12px 24px',
+              outline: 'none',
+              transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0px)';
             }}
           >
-            <span
+            {/* 1. Tailor's Golden Needle Eye & Gliding Basting Stitch Track */}
+            <div
               style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: '#c5a880',
-                boxShadow: '0 0 8px #c5a880',
+                position: 'relative',
+                width: '2px',
+                height: '42px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
-            />
-            <span>31 Allenby Road, Kolkata</span>
-          </div>
+            >
+              {/* Needle Eye Ring */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-6px',
+                  width: '7px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  border: '1.5px solid #c5a880',
+                  boxShadow: '0 0 8px rgba(197, 168, 128, 0.6)',
+                }}
+              />
 
-          {/* Interactive Scroll Cue */}
-          <div
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#cfd3e5',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '6px 14px',
-              background: 'rgba(11, 15, 24, 0.6)',
-              border: '1px solid rgba(207, 211, 229, 0.2)',
-              borderRadius: '20px',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            <span>Scroll to unveil atelier</span>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M6 2v8M2.5 6.5L6 10l3.5-3.5" stroke="currentColor" strokeWidth="1.2" />
-            </svg>
-          </div>
+              {/* Dashed Basting Thread Line */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '4px',
+                  bottom: '4px',
+                  width: '1px',
+                  background:
+                    'repeating-linear-gradient(to bottom, #c5a880 0px, #c5a880 4px, transparent 4px, transparent 8px)',
+                  opacity: 0.65,
+                }}
+              />
+
+              {/* Gliding Zari Thread Bead */}
+              <div
+                style={{
+                  position: 'absolute',
+                  width: '5px',
+                  height: '5px',
+                  borderRadius: '50%',
+                  backgroundColor: '#f3f5fe',
+                  boxShadow: '0 0 10px #c5a880, 0 0 4px #ffffff',
+                  animation: 'basting-stitch-glide 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+                }}
+              />
+            </div>
+
+            {/* 2. Micro-Engraved Tailor's Coordinate Typography */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '4px',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '9.5px',
+                  fontFamily: 'var(--font-cinzel), Georgia, serif',
+                  letterSpacing: '0.28em',
+                  textTransform: 'uppercase',
+                  color: '#cfd3e5',
+                  textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Unveil Atelier
+              </span>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M5 2v6M2 5l3 3 3-3" stroke="#c5a880" strokeWidth="1.2" />
+              </svg>
+            </div>
+          </button>
         </div>
       </div>
     </section>

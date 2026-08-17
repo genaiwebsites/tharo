@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { computeStoreStatus } from '@/lib/storeStatus';
 import { StoreStatus } from '@/lib/types';
 
 export default function Header() {
   const [status, setStatus] = useState<StoreStatus>(computeStoreStatus());
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const [isHeroPassedStart, setIsHeroPassedStart] = useState<boolean>(false);
 
   useEffect(() => {
     const tick = setInterval(() => {
@@ -16,11 +16,13 @@ export default function Header() {
     }, 60000);
 
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      const sy = window.scrollY;
+      setIsHeroPassedStart(sy > 60);
+      setIsScrolled(sy > 160);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // initial check
+    onScroll();
 
     return () => {
       clearInterval(tick);
@@ -43,17 +45,18 @@ export default function Header() {
         padding: isScrolled
           ? '16px 32px 16px clamp(22px, 6.5vw, 92px)'
           : '24px 32px 24px clamp(22px, 6.5vw, 92px)',
+        opacity: isHeroPassedStart ? 1 : 0,
+        transform: isHeroPassedStart ? 'translateY(0)' : 'translateY(-14px)',
+        pointerEvents: isHeroPassedStart ? 'auto' : 'none',
         backdropFilter: isScrolled ? 'blur(20px) saturate(140%)' : 'none',
         WebkitBackdropFilter: isScrolled ? 'blur(20px) saturate(140%)' : 'none',
         background: isScrolled
           ? 'linear-gradient(180deg, rgba(11, 15, 24, 0.88) 0%, rgba(11, 15, 24, 0.72) 100%)'
           : 'transparent',
         borderBottom: 'none',
-        boxShadow: isScrolled
-          ? '0 12px 32px -8px rgba(0, 0, 0, 0.75)'
-          : 'none',
+        boxShadow: isScrolled ? '0 12px 32px -8px rgba(0, 0, 0, 0.75)' : 'none',
         transition:
-          'padding 400ms cubic-bezier(0.16, 1, 0.3, 1), background 400ms ease, backdrop-filter 400ms ease, box-shadow 400ms ease'
+          'opacity 500ms cubic-bezier(0.16, 1, 0.3, 1), transform 500ms cubic-bezier(0.16, 1, 0.3, 1), padding 400ms cubic-bezier(0.16, 1, 0.3, 1), background 400ms ease, backdrop-filter 400ms ease, box-shadow 400ms ease',
       }}
     >
       <Link
@@ -62,7 +65,7 @@ export default function Header() {
           display: 'inline-flex',
           alignItems: 'center',
           textDecoration: 'none',
-          paddingRight: '6px'
+          paddingRight: '6px',
         }}
         aria-label="THARO — Back to top"
       >
@@ -79,7 +82,7 @@ export default function Header() {
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: '#9397ab',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
           }}
         >
           <span
@@ -89,7 +92,7 @@ export default function Header() {
               borderRadius: '50%',
               background: status.open ? '#8fb996' : '#8a6a6f',
               boxShadow: `0 0 10px ${status.open ? '#8fb996' : '#8a6a6f'}`,
-              flex: 'none'
+              flex: 'none',
             }}
           />
           <span>{status.short}</span>
@@ -98,13 +101,20 @@ export default function Header() {
         <Link
           href="#fitting-room"
           style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 18px',
+            background: 'rgba(207, 211, 229, 0.08)',
+            border: '1px solid rgba(207, 211, 229, 0.22)',
+            borderRadius: '6px',
             fontSize: '11.5px',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: '#cfd3e5',
-            borderBottom: '1px solid rgba(207, 211, 229, 0.32)',
-            paddingBottom: '3px',
-            whiteSpace: 'nowrap'
+            color: '#f3f5fe',
+            textDecoration: 'none',
+            transition: 'all 280ms cubic-bezier(0.16, 1, 0.3, 1)',
+            whiteSpace: 'nowrap',
           }}
         >
           Book a fitting

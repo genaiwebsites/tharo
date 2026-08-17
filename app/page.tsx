@@ -28,6 +28,22 @@ export default function Home() {
   const [storeStatus] = useState<StoreStatus>(computeStoreStatus());
   const occTempRef = useRef<number>(0.7);
   const timeWarmRef = useRef<number>(0);
+  const lastTRef = useRef<number>(-1);
+
+  // Cached layout coordinates to avoid synchronous layout reflows on scroll
+  const layoutCacheRef = useRef<{
+    triggerY: number;
+    totalSpan: number;
+    handY: number | null;
+    warmY: number | null;
+    closeY: number | null;
+  }>({
+    triggerY: 0,
+    totalSpan: 1,
+    handY: null,
+    warmY: null,
+    closeY: null,
+  });
 
   useEffect(() => {
     // Determine ambient time warmth (evening / night warmth)
@@ -37,12 +53,12 @@ export default function Home() {
     // Register GSAP ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
 
-    // Initialize Lenis butter-smooth scroll
+    // Initialize Lenis butter-smooth 60/120 FPS scroll
     const lenis = new Lenis({
-      lerp: 0.075,
+      lerp: 0.085,
       smoothWheel: true,
-      wheelMultiplier: 0.95,
-      touchMultiplier: 1.25,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.2,
       infinite: false,
     });
 
@@ -53,16 +69,41 @@ export default function Home() {
     gsap.ticker.add(gsapTicker);
     gsap.ticker.lagSmoothing(0);
 
-    // Dynamic temperature applicator
-    const applyTemperature = (currentScrollY: number) => {
+    // Measure layout once and on resize
+    const updateLayoutCache = () => {
+      const vh = window.innerHeight;
+      const thresholdEl = document.getElementById('threshold');
+      const meaningEl = document.getElementById('meaning');
       const handEl = document.getElementById('the-hand');
       const warmEl = document.getElementById('warm-room');
       const closeEl = document.getElementById('fitting-room');
 
-      const handY = handEl ? handEl.getBoundingClientRect().top + currentScrollY : null;
-      const warmY = warmEl ? warmEl.getBoundingClientRect().top + currentScrollY : null;
-      const closeY = closeEl ? closeEl.getBoundingClientRect().top + currentScrollY : null;
+      let trigY = 0;
+      if (thresholdEl) {
+        const span = Math.max(1, thresholdEl.offsetHeight - vh);
+        trigY = thresholdEl.offsetTop + span * 0.8;
+      } else if (meaningEl) {
+        trigY = meaningEl.offsetTop;
+      }
 
+      const totalHeight = document.documentElement.scrollHeight - vh;
+      const totalSpan = Math.max(1, totalHeight - trigY);
+
+      layoutCacheRef.current = {
+        triggerY: trigY,
+        totalSpan,
+        handY: handEl ? handEl.offsetTop : null,
+        warmY: warmEl ? warmEl.offsetTop : null,
+        closeY: closeEl ? closeEl.offsetTop : null,
+      };
+    };
+
+    updateLayoutCache();
+    window.addEventListener('resize', updateLayoutCache, { passive: true });
+
+    // Dynamic temperature applicator (cached without layout thrashing)
+    const applyTemperature = (currentScrollY: number) => {
+      const { handY, warmY, closeY } = layoutCacheRef.current;
       const vh = window.innerHeight;
       const mid = currentScrollY + vh * 0.5;
       let w = 0;
@@ -79,6 +120,10 @@ export default function Home() {
       const occ = occTempRef.current ?? 0.7;
       const t = Math.min(1, w * (0.72 + occ * 0.38));
 
+      // Skip DOM styling if value hasn't shifted significantly
+      if (Math.abs(lastTRef.current - t) < 0.015) return;
+      lastTRef.current = t;
+
       const mix = (a: number[], b: number[]) =>
         a.map((v, i) => Math.round(v + (b[i] - v) * t));
 
@@ -87,7 +132,7 @@ export default function Home() {
       const grade = mix([18, 42, 74], [92, 54, 26]);
 
       const root = document.documentElement;
-      root.style.setProperty('--warm', t.toFixed(3));
+      root.style.setProperty('--warm', t.toFixed(2));
       root.style.setProperty('--room-bg', `rgb(${bg.join(',')})`);
       root.style.setProperty('--room-panel', `rgb(${panel.join(',')})`);
       root.style.setProperty(
@@ -96,36 +141,31 @@ export default function Home() {
       );
     };
 
+    let ticking = false;
     lenis.on('scroll', (e: { scroll: number }) => {
       ScrollTrigger.update();
 
-      const scrollY = e.scroll;
-      const thresholdEl = document.getElementById('threshold');
-      const meaningEl = document.getElementById('meaning');
-      const vh = window.innerHeight;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = e.scroll;
+          const { triggerY, totalSpan } = layoutCacheRef.current;
 
-      let triggerY = 0;
-      if (thresholdEl) {
-        const span = Math.max(1, thresholdEl.offsetHeight - vh);
-        triggerY = thresholdEl.offsetTop + span * 0.8;
-      } else if (meaningEl) {
-        triggerY = meaningEl.offsetTop;
+          const hasPassedHero = scrollY >= triggerY;
+          setIsHeroPassed((prev) => (prev !== hasPassedHero ? hasPassedHero : prev));
+
+          if (hasPassedHero) {
+            const relativeScroll = Math.max(0, scrollY - triggerY);
+            const tProg = Math.min(1, Math.max(0, relativeScroll / totalSpan));
+            setThreadProgress((prev) => (Math.abs(prev - tProg) > 0.005 ? tProg : prev));
+          } else {
+            setThreadProgress((prev) => (prev !== 0 ? 0 : prev));
+          }
+
+          applyTemperature(scrollY);
+          ticking = false;
+        });
+        ticking = true;
       }
-
-      const hasPassedHeroBeat3 = scrollY >= triggerY;
-      setIsHeroPassed((prev) => (prev !== hasPassedHeroBeat3 ? hasPassedHeroBeat3 : prev));
-
-      if (hasPassedHeroBeat3) {
-        const totalHeight = document.documentElement.scrollHeight - vh;
-        const totalSpan = Math.max(1, totalHeight - triggerY);
-        const relativeScroll = Math.max(0, scrollY - triggerY);
-        const tProg = Math.min(1, Math.max(0, relativeScroll / totalSpan));
-        setThreadProgress((prev) => (Math.abs(prev - tProg) > 0.001 ? tProg : prev));
-      } else {
-        setThreadProgress((prev) => (prev !== 0 ? 0 : prev));
-      }
-
-      applyTemperature(scrollY);
     });
 
     // Staggered reveals via GSAP
@@ -133,55 +173,17 @@ export default function Home() {
     revealElements.forEach((el) => {
       gsap.fromTo(
         el,
-        { opacity: 0, y: 34, filter: 'blur(8px)' },
+        { opacity: 0, y: 28, filter: 'blur(6px)' },
         {
           opacity: 1,
           y: 0,
           filter: 'blur(0px)',
-          duration: 1.15,
-          ease: 'power3.out',
+          duration: 0.9,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: el,
-            start: 'top 88%',
-          },
-        }
-      );
-    });
-
-    const headingElements = document.querySelectorAll('main section:not(#threshold) h2');
-    headingElements.forEach((el) => {
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 26 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.25,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 90%',
-          },
-        }
-      );
-    });
-
-    // Image depth scrubbing
-    const scrubImages = document.querySelectorAll(
-      '#blue-room figure img, #the-hand figure img, #diaries figure img'
-    );
-    scrubImages.forEach((el) => {
-      gsap.fromTo(
-        el,
-        { scale: 1.12 },
-        {
-          scale: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 0.7,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
           },
         }
       );
@@ -191,44 +193,56 @@ export default function Home() {
       gsap.ticker.remove(gsapTicker);
       lenis.destroy();
       ScrollTrigger.getAll().forEach((t) => t.kill());
+      window.removeEventListener('resize', updateLayoutCache);
     };
   }, []);
 
-  const handleOccasionChange = (id: string) => {
-    occTempRef.current = { haldi: 1, sangeet: 0.82, wedding: 0.7, reception: 0.42 }[id] || 0.7;
-  };
-
   return (
-    <div
+    <main
       style={{
         position: 'relative',
-        background: 'var(--room-bg)',
+        minHeight: '100vh',
+        backgroundColor: 'var(--room-bg)',
         color: 'var(--room-fg)',
-        fontFamily: 'var(--font-inter-tight), -apple-system, BlinkMacSystemFont, sans-serif',
-        fontSize: '17px',
-        lineHeight: 1.65,
-        letterSpacing: '0.005em',
         overflowX: 'clip',
-        transition: 'background 600ms cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       <Header />
+
+      {/* Hero: 1080p Canvas Threshold & ReactBits Silk Shader */}
+      <HeroThreshold storeStatus={storeStatus} />
+
+      {/* The Story & Meaning Behind THARO */}
+      <TheNameMeaning />
+
+      {/* The Bespoke Indigo Blue Room */}
+      <BlueRoom />
+
+      {/* The Bespoke Rail Collection */}
+      <TheRail />
+
+      {/* The 42-Point Hand Measurement Loupe */}
+      <TheHandLoupe />
+
+      {/* Imperial Wedding Warm Room */}
+      <WarmRoomWedding />
+
+      {/* 3D Master Fitting Room Card Deck */}
+      <TheFitting />
+
+      {/* Volumetric 3D Atelier Spatial Canvas */}
+      <VolumetricAtelierStudio />
+
+      {/* Client Fitting Diaries & Testimonials */}
+      <ClientDiaries />
+
+      {/* Private Appointment Card */}
+      <FittingRoomCard />
+
+      {/* Persistent Gold Thread of Passage (Chapter Navigator) */}
       <TheThread visible={isHeroPassed} scrollProgress={threadProgress} />
 
-      <main>
-        <HeroThreshold storeStatus={storeStatus} />
-        <TheNameMeaning />
-        <BlueRoom />
-        <TheRail />
-        <TheHandLoupe />
-        <WarmRoomWedding onOccasionChange={handleOccasionChange} />
-        <TheFitting />
-        <ClientDiaries />
-        <FittingRoomCard />
-        <VolumetricAtelierStudio />
-      </main>
-
       <Footer />
-    </div>
+    </main>
   );
 }

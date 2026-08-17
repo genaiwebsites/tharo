@@ -12,106 +12,115 @@ export default function TheNameMeaning() {
         data-screen-label="Meaning"
         style={{
           position: 'relative',
-          padding: 'min(20vh, 180px) 32px min(18vh, 150px) clamp(22px, 6.5vw, 92px)'
+          padding: 'clamp(54px, 8vh, 84px) 32px clamp(54px, 8vh, 84px) clamp(22px, 6.5vw, 92px)',
         }}
       >
         <SectionScrim />
         <div
           style={{
-            maxWidth: '1180px',
+            maxWidth: '1120px',
             margin: '0 auto',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: 'clamp(40px, 7vw, 110px)',
-            alignItems: 'center'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 'clamp(36px, 5vw, 72px)',
+            alignItems: 'center',
           }}
         >
+          {/* Left Column: Editorial Manifesto */}
           <div>
+            {/* Eyebrow Chapter Tag */}
             <p
               style={{
-                margin: '0 0 42px',
-                fontSize: '11px',
+                margin: '0 0 20px',
+                fontSize: '10.5px',
                 letterSpacing: '0.28em',
                 textTransform: 'uppercase',
-                color: '#75798c'
+                color: '#c5a880',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
             >
-              The name
+              <span style={{ width: '14px', height: '1px', background: '#c5a880' }} />
+              The Philosophy
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: 'var(--font-noto-devanagari), sans-serif',
-                  fontWeight: 600,
-                  fontSize: 'clamp(30px, 4.4vw, 54px)',
-                  lineHeight: 1.25,
-                  color: '#f3f5fe'
-                }}
-              >
-                थारो
-              </p>
+
+            {/* Unified Typographic Headline */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px', flexWrap: 'wrap' }}>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-noto-devanagari), sans-serif',
+                    fontWeight: 600,
+                    fontSize: 'clamp(28px, 3.4vw, 44px)',
+                    lineHeight: 1.15,
+                    color: '#f3f5fe',
+                  }}
+                >
+                  थारो
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
+                    fontWeight: 400,
+                    fontSize: 'clamp(26px, 3.2vw, 42px)',
+                    lineHeight: 1.15,
+                    color: '#c5a880',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  yours
+                </span>
+              </div>
               <p
                 style={{
                   margin: 0,
                   fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
                   fontWeight: 400,
-                  fontSize: 'clamp(30px, 4.4vw, 54px)',
+                  fontSize: 'clamp(20px, 2.2vw, 28px)',
                   lineHeight: 1.25,
-                  color: '#cfd3e5',
-                  fontStyle: 'italic'
+                  color: '#9397ab',
+                  letterSpacing: '0.02em',
                 }}
               >
-                yours
-              </p>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: 'var(--font-cormorant), var(--font-cinzel), Georgia, serif',
-                  fontWeight: 400,
-                  fontSize: 'clamp(30px, 4.4vw, 54px)',
-                  lineHeight: 1.25,
-                  color: '#75798c'
-                }}
-              >
-                designed for you
+                Designed for you. Never the rack.
               </p>
             </div>
+
+            {/* Poetic & Sharp Manifesto Copy */}
             <p
               style={{
-                margin: '44px 0 0',
-                maxWidth: '44ch',
-                fontSize: '17px',
+                margin: '24px 0 0',
+                maxWidth: '42ch',
+                fontSize: 'clamp(14.5px, 1.4vw, 16px)',
                 lineHeight: 1.7,
                 color: '#b2b6ca',
-                textWrap: 'pretty'
+                textWrap: 'pretty',
               }}
             >
-              <em style={{ fontStyle: 'normal', color: '#e9e9ed' }}>Tharo</em> means{' '}
-              <em style={{ fontStyle: 'normal', color: '#e9e9ed' }}>yours</em> in Marwari. Not a slogan
-              the house adopted — the whole instruction. The word is second person: the garment
-              belongs to the man standing in front of the mirror before it belongs to the house that made
-              it.
+              In Marwari, <strong style={{ fontWeight: 600, color: '#f3f5fe' }}>Tharo</strong> translates directly to{' '}
+              <strong style={{ fontWeight: 600, color: '#f3f5fe' }}>yours</strong>. It is not a marketing slogan—it is the whole instruction. Every anatomical cut, basting stitch, and lapel contour is crafted in the second person: belonging to the gentleman standing before the mirror before it ever belongs to the atelier.
             </p>
           </div>
 
-          <figure style={{ margin: 0, position: 'relative' }}>
+          {/* Right Column: Tailored Haute Couture Specimen Card */}
+          <figure style={{ margin: '0 auto', maxWidth: '400px', width: '100%', position: 'relative' }}>
             <div
               style={{
                 position: 'relative',
-                aspectRatio: '4/5',
+                aspectRatio: '3/4',
                 overflow: 'hidden',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 background: '#131b29',
                 border: '1px solid rgba(207, 211, 229, 0.16)',
-                boxShadow: '0 30px 80px rgba(0, 0, 0, 0.7), 0 0 35px rgba(207, 211, 229, 0.08)',
+                boxShadow: '0 24px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(197, 168, 128, 0.08)',
               }}
             >
               <Image
                 src="/images/collection/tharo-navy-bespoke-suit-structured-shoulder.png"
                 alt="Silver cornelli soutache hand-embroidery across the shoulder of bespoke THARO navy tailoring"
                 fill
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="(max-width: 768px) 100vw, 400px"
                 style={{
                   objectFit: 'cover',
                   objectPosition: 'center',
@@ -123,14 +132,14 @@ export default function TheNameMeaning() {
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(180deg, transparent 65%, rgba(11, 15, 24, 0.6) 100%)',
+                  background: 'linear-gradient(180deg, transparent 65%, rgba(11, 15, 24, 0.65) 100%)',
                 }}
               />
             </div>
             <figcaption
               style={{
-                marginTop: '14px',
-                fontSize: '11px',
+                marginTop: '12px',
+                fontSize: '10.5px',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 color: '#8a90a2',
