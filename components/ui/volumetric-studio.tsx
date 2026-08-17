@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { SpotLight } from '@react-three/drei';
@@ -108,6 +108,14 @@ function SilkyCanvasAtmosphericDust({
   );
 }
 
+const parseRgbToThreeColor = (colorStr: string) => {
+  const parts = colorStr.replace(/[^\d,]/g, '').split(',').map(Number);
+  if (parts.length >= 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+    return new THREE.Color(parts[0] / 255, parts[1] / 255, parts[2] / 255);
+  }
+  return new THREE.Color(colorStr);
+};
+
 // 3D Volumetric Spotlight Beam with Motorized Ray Tracking Physics
 function RayTrackedSpotlight({
   color,
@@ -130,28 +138,71 @@ function RayTrackedSpotlight({
   const targetObj = useMemo(() => new THREE.Object3D(), []);
   const currentPos = useRef(new THREE.Vector3(inwardAim, -3.4, 0));
 
+  const parsedColor = useMemo(() => parseRgbToThreeColor(color), [color]);
+
+  const applyColor = useCallback((targetColor: THREE.Color, lerpRatio = 1.0) => {
+    if (!spotRef.current) return;
+    if (lerpRatio === 1.0) {
+      spotRef.current.color.copy(targetColor);
+    } else {
+      spotRef.current.color.lerp(targetColor, lerpRatio);
+    }
+
+    spotRef.current.traverse((child: any) => {
+      if (child.material) {
+        const mat = child.material;
+        if (mat.color && typeof mat.color.copy === 'function') {
+          if (lerpRatio === 1.0) mat.color.copy(targetColor);
+          else mat.color.lerp(targetColor, lerpRatio);
+        }
+        if (mat.uniforms) {
+          Object.keys(mat.uniforms).forEach((key) => {
+            const u = mat.uniforms[key];
+            if (
+              u &&
+              u.value &&
+              (u.value instanceof THREE.Color ||
+                (typeof u.value === 'object' && 'r' in u.value && 'g' in u.value && 'b' in u.value))
+            ) {
+              if (lerpRatio === 1.0) {
+                u.value.copy(targetColor);
+              } else if (typeof u.value.lerp === 'function') {
+                u.value.lerp(targetColor, lerpRatio);
+              }
+            }
+          });
+        }
+        mat.needsUpdate = true;
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    applyColor(parsedColor, 1.0);
+  }, [parsedColor, applyColor]);
+
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
     const mx = mousePos.x;
     const my = mousePos.y;
 
     let destX = inwardAim;
-    let destY = -3.4;
+    let destY = -6.8;
 
     if (isCenter) {
       if (isFollowMode) {
         // Smooth continuous ray tracking following the user's cursor
-        destX = mx * 1.8;
-        destY = -3.4 - my * 0.45;
+        destX = mx * 2.2;
+        destY = -6.8 - my * 0.6;
       } else {
         // Natural resting idle center with subtle organic breath
-        destX = Math.sin(t * 0.4) * 0.12;
-        destY = -3.4 + Math.cos(t * 0.3) * 0.06;
+        destX = Math.sin(t * 0.4) * 0.15;
+        destY = -6.8 + Math.cos(t * 0.3) * 0.08;
       }
     } else {
       // Side rim spotlights aim inward toward the central runway model
-      destX = inwardAim + (isFollowMode ? mx * 0.4 : Math.sin(t * 0.4) * 0.1);
-      destY = -3.4;
+      destX = inwardAim * 1.6 + (isFollowMode ? mx * 0.5 : Math.sin(t * 0.4) * 0.12);
+      destY = -6.8;
     }
 
     currentPos.current.x = THREE.MathUtils.damp(currentPos.current.x, destX, 7, delta);
@@ -164,33 +215,35 @@ function RayTrackedSpotlight({
     if (spotRef.current) {
       spotRef.current.target = targetObj;
       const targetIntensity = lightsOn
-        ? intensity * (isCenter ? 1.25 : 0.8) * (0.97 + Math.sin(t * 2.0) * 0.03)
+        ? intensity * (isCenter ? 1.35 : 0.9) * (0.97 + Math.sin(t * 2.0) * 0.03)
         : 0;
       spotRef.current.intensity = THREE.MathUtils.lerp(
         spotRef.current.intensity,
         targetIntensity,
         0.1
       );
+      applyColor(parsedColor, 0.15);
     }
   });
 
   return (
     <>
       <primitive object={targetObj} />
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={0.3} />
       <SpotLight
         ref={spotRef}
+        key={color}
         target={targetObj}
-        position={[0, 4.1, 0]}
+        position={[0, 4.0, 0]}
         color={color.includes(',') ? `rgb(${color})` : color}
-        distance={16}
-        angle={isCenter ? 0.36 : 0.28}
-        attenuation={isCenter ? 3.8 : 5.0}
-        anglePower={isCenter ? 3.6 : 4.6}
+        distance={28}
+        angle={isCenter ? 0.48 : 0.40}
+        attenuation={isCenter ? 6.2 : 7.2}
+        anglePower={isCenter ? 4.2 : 4.8}
         volumetric
-        opacity={lightsOn ? (isCenter ? 1.0 : 0.75) : 0}
+        opacity={lightsOn ? (isCenter ? 0.95 : 0.78) : 0}
         radiusTop={0.1}
-        radiusBottom={isCenter ? 5.6 : 3.8}
+        radiusBottom={isCenter ? 8.2 : 6.4}
       />
     </>
   );
@@ -441,7 +494,7 @@ export function StudioRoom({
 
           return (
             <motion.div
-              key={i}
+              key={`${formattedColor}-${pos}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: lightsOn ? intensity : 0 }}
               transition={
@@ -452,23 +505,25 @@ export function StudioRoom({
               style={{
                 position: 'absolute',
                 display: 'flex',
-                width: '320px',
-                height: '80vh',
+                width: '480px',
+                height: '92vh',
                 transform: 'translateX(-50%)',
                 justifyContent: 'center',
                 pointerEvents: 'none',
                 left: `${pos}%`,
-                top: 'calc(3% + 80px)',
+                top: 'calc(3% + 56px)',
                 mixBlendMode: 'screen',
                 willChange: 'opacity',
               }}
             >
               <Canvas
+                key={`${formattedColor}-${pos}`}
                 camera={{ position: [0, 0, 10], fov: 45 }}
                 shadows={false}
                 gl={{ alpha: true }}
               >
                 <RayTrackedSpotlight
+                  key={formattedColor}
                   color={formattedColor}
                   isCenter={isCenter}
                   lightsOn={lightsOn}
@@ -653,34 +708,34 @@ export function StudioRoom({
                 />
               </div>
 
-              {/* Circular Bottom Lens Dish */}
+              {/* Illuminated Optical Circular Lens Dish */}
               <div
                 style={{
                   position: 'absolute',
-                  bottom: '-6px',
-                  width: '58px',
-                  height: '18px',
+                  bottom: '-4px',
+                  width: '54px',
+                  height: '16px',
                   borderRadius: '50%',
-                  border: '2px solid #18181b',
-                  boxShadow: '0 10px 15px rgba(0,0,0,1)',
+                  border: '1.5px solid #18181b',
+                  boxShadow: '0 8px 12px rgba(0,0,0,0.9)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   zIndex: 10,
                   overflow: 'hidden',
-                  background: 'radial-gradient(ellipse at center, #222, #000)',
+                  background: 'radial-gradient(ellipse at center, #222226, #09090b)',
                 }}
               >
                 <div
                   style={{
-                    width: '34px',
-                    height: '10px',
+                    width: '36px',
+                    height: '9px',
                     borderRadius: '50%',
-                    transition: 'all 700ms ease',
-                    background: lightsOn ? '#ffffff' : '#111111',
+                    transition: 'background 400ms ease, box-shadow 400ms ease',
+                    background: lightsOn ? `rgb(${rawRgb})` : '#111111',
                     boxShadow: lightsOn
-                      ? `0 0 20px 8px rgba(${rawRgb},0.95), inset 0 0 8px #ffffff`
-                      : 'inset 0 2px 5px rgba(0,0,0,0.9), inset 0 -1px 1px rgba(255,255,255,0.05)',
+                      ? `0 0 16px 6px rgba(${rawRgb}, 0.85), inset 0 0 4px #ffffff`
+                      : 'inset 0 1px 3px rgba(0,0,0,0.9)',
                   }}
                 />
               </div>
@@ -854,6 +909,7 @@ export const VolumetricStudio = ({
   intensity = 1,
   mousePos = { x: 0, y: 0 },
   isFollowMode = true,
+  lightsOn: userLightsOn,
 }: {
   className?: string;
   style?: React.CSSProperties;
@@ -863,8 +919,9 @@ export const VolumetricStudio = ({
   intensity?: number;
   mousePos?: { x: number; y: number };
   isFollowMode?: boolean;
+  lightsOn?: boolean;
 }) => {
-  const [lightsOn, setLightsOn] = useState(false);
+  const [internalLightsOn, setInternalLightsOn] = useState(false);
   const [isFlickering, setIsFlickering] = useState(true);
 
   useEffect(() => {
@@ -873,31 +930,38 @@ export const VolumetricStudio = ({
       const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
       await sleep(600);
       if (!mounted) return;
-      setLightsOn(true);
+      setInternalLightsOn(true);
       await sleep(100);
-      setLightsOn(false);
+      setInternalLightsOn(false);
       await sleep(300);
-      setLightsOn(true);
+      setInternalLightsOn(true);
       await sleep(50);
-      setLightsOn(false);
+      setInternalLightsOn(false);
       await sleep(200);
-      setLightsOn(true);
+      setInternalLightsOn(true);
       await sleep(40);
-      setLightsOn(false);
+      setInternalLightsOn(false);
       await sleep(60);
-      setLightsOn(true);
+      setInternalLightsOn(true);
       await sleep(40);
-      setLightsOn(false);
+      setInternalLightsOn(false);
       await sleep(400);
       if (!mounted) return;
       setIsFlickering(false);
-      setLightsOn(true);
+      setInternalLightsOn(true);
     };
     runFlicker();
     return () => {
       mounted = false;
     };
   }, []);
+
+  const effectiveLightsOn =
+    userLightsOn !== undefined
+      ? isFlickering
+        ? internalLightsOn
+        : userLightsOn
+      : internalLightsOn;
 
   return (
     <section
@@ -913,7 +977,7 @@ export const VolumetricStudio = ({
       className={cn('font-sans', className)}
     >
       <StudioRoom
-        lightsOn={lightsOn}
+        lightsOn={effectiveLightsOn}
         intensity={intensity}
         lightColor={lightColor}
         spots={spots}

@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { VolumetricStudio } from '@/components/ui/volumetric-studio';
-import { ArrowUpRight, Sparkles, MousePointerClick } from 'lucide-react';
+import { ArrowUpRight, Sparkles, MousePointerClick, Power } from 'lucide-react';
 
 interface AtelierLook {
   id: string;
@@ -16,20 +16,20 @@ interface AtelierLook {
 
 const ATELIER_COLLECTION: AtelierLook[] = [
   {
-    id: 'sherwani',
-    number: '01',
-    name: 'The Imperial Ivory Sherwani',
-    category: 'Royal Nuptials',
-    materials: 'Hand-woven Raw Silk · Silver Micro-Zari Resham',
-    image: '/images/studio/model-ivory-sherwani.png',
-  },
-  {
     id: 'tuxedo',
-    number: '02',
+    number: '01',
     name: 'The Midnight Velvet Tuxedo',
     category: 'Black Tie Ceremonial',
     materials: 'Milano Silk-Cotton Velvet · Pure Silk Faille Lapels',
     image: '/images/studio/model-midnight-tuxedo.png',
+  },
+  {
+    id: 'oxblood',
+    number: '02',
+    name: 'The Ruby Oxblood Velvet Bandhgala',
+    category: 'Sovereign Evening',
+    materials: 'Deep Wine Silk Velvet · Antique Gold Marodi Embroidery',
+    image: '/images/studio/model-oxblood-velvet.png',
   },
   {
     id: 'jodhpuri',
@@ -40,12 +40,12 @@ const ATELIER_COLLECTION: AtelierLook[] = [
     image: '/images/studio/model-royal-jodhpuri.png',
   },
   {
-    id: 'oxblood',
+    id: 'sherwani',
     number: '04',
-    name: 'The Ruby Oxblood Velvet Bandhgala',
-    category: 'Sovereign Evening',
-    materials: 'Deep Wine Silk Velvet · Antique Gold Marodi Embroidery',
-    image: '/images/studio/model-oxblood-velvet.png',
+    name: 'The Imperial Ivory Sherwani',
+    category: 'Royal Nuptials',
+    materials: 'Hand-woven Raw Silk · Silver Micro-Zari Resham',
+    image: '/images/studio/model-ivory-sherwani.png',
   },
 ];
 
@@ -62,35 +62,36 @@ const LIGHT_MOODS: LightMood[] = [
     id: 'diamond',
     label: 'Diamond White',
     temp: '5600K',
-    color: '240,246,255',
+    color: '245,248,255',
     swatch: '#ffffff',
   },
   {
     id: 'amber',
     label: 'Imperial Amber',
     temp: '3000K',
-    color: '252,216,162',
-    swatch: '#f5c070',
+    color: '255,185,90',
+    swatch: '#f5a623',
   },
   {
     id: 'indigo',
     label: 'Midnight Indigo',
     temp: '7500K',
-    color: '145,182,255',
-    swatch: '#8fb4ff',
+    color: '100,160,255',
+    swatch: '#6395ff',
   },
   {
     id: 'ruby',
     label: 'Ruby Dusk',
     temp: '2600K',
-    color: '255,160,185',
-    swatch: '#f78ca5',
+    color: '255,80,130',
+    swatch: '#ff4d79',
   },
 ];
 
 export default function VolumetricAtelierStudio() {
   const [activeLookIndex, setActiveLookIndex] = useState<number>(0);
   const [activeMood, setActiveMood] = useState<LightMood>(LIGHT_MOODS[0]);
+  const [lightsOn, setLightsOn] = useState<boolean>(true);
   const [isFollowMode, setIsFollowMode] = useState<boolean>(true);
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
@@ -127,6 +128,7 @@ export default function VolumetricAtelierStudio() {
     >
       {/* 3D Physical Volumetric Studio Canvas */}
       <VolumetricStudio
+        lightsOn={lightsOn}
         lightColor={activeMood.color}
         spots={[35, 50, 65]}
         intensity={1}
@@ -170,34 +172,88 @@ export default function VolumetricAtelierStudio() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '8px',
-                background: 'rgba(6, 9, 15, 0.75)',
+                background: 'rgba(6, 9, 15, 0.78)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '9999px',
-                padding: '10px 6px',
+                padding: '8px 6px',
                 boxShadow: '0 12px 32px rgba(0, 0, 0, 0.85)',
               }}
             >
-              <div
+              {/* Luxury Tactile Master Lighting Power Toggle */}
+              <button
+                onClick={() => setLightsOn((prev) => !prev)}
+                title={
+                  lightsOn
+                    ? 'Studio Master Lighting: ON (Click to turn off)'
+                    : 'Studio Master Lighting: STANDBY (Click to turn on)'
+                }
                 style={{
-                  width: '18px',
-                  height: '18px',
+                  position: 'relative',
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  border: lightsOn
+                    ? '1px solid rgba(197, 168, 128, 0.65)'
+                    : '1px solid rgba(255, 255, 255, 0.12)',
+                  background: lightsOn
+                    ? 'radial-gradient(circle at center, #1f2736 0%, #0c1017 100%)'
+                    : 'radial-gradient(circle at center, #141418 0%, #08080a 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: '2px',
+                  transition: 'all 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: lightsOn
+                    ? '0 0 14px rgba(197, 168, 128, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.2)'
+                    : 'inset 0 2px 4px rgba(0, 0, 0, 0.8)',
+                  transform: lightsOn ? 'scale(1)' : 'scale(0.95)',
                 }}
               >
-                <Sparkles size={11} color="#c5a880" />
-              </div>
+                {/* Active Micro-LED Indicator Ring */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '2px',
+                    right: '2px',
+                    width: '5px',
+                    height: '5px',
+                    borderRadius: '50%',
+                    backgroundColor: lightsOn ? '#4ade80' : '#ef4444',
+                    boxShadow: lightsOn ? '0 0 6px #4ade80' : '0 0 4px #ef4444',
+                    transition: 'all 300ms ease',
+                  }}
+                />
+                <Power
+                  size={12}
+                  strokeWidth={2.4}
+                  color={lightsOn ? '#ffffff' : 'rgba(255, 255, 255, 0.35)'}
+                  style={{
+                    filter: lightsOn ? 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.6))' : 'none',
+                    transition: 'all 300ms ease',
+                  }}
+                />
+              </button>
+
+              <div
+                style={{
+                  width: '14px',
+                  height: '1px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  margin: '2px 0',
+                }}
+              />
 
               {LIGHT_MOODS.map((mood) => {
                 const isSelected = activeMood.id === mood.id;
                 return (
                   <button
                     key={mood.id}
-                    onClick={() => setActiveMood(mood)}
+                    onClick={() => {
+                      setActiveMood(mood);
+                      if (!lightsOn) setLightsOn(true);
+                    }}
                     title={`${mood.label} (${mood.temp})`}
                     style={{
                       position: 'relative',
@@ -205,14 +261,15 @@ export default function VolumetricAtelierStudio() {
                       height: '28px',
                       borderRadius: '50%',
                       cursor: 'pointer',
-                      border: isSelected ? '1px solid rgba(255, 255, 255, 0.9)' : '1px solid rgba(255, 255, 255, 0.15)',
-                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                      border: isSelected && lightsOn ? '1px solid rgba(255, 255, 255, 0.9)' : '1px solid rgba(255, 255, 255, 0.15)',
+                      backgroundColor: isSelected && lightsOn ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
                       transition: 'all 250ms ease',
-                      boxShadow: isSelected ? `0 0 12px ${mood.swatch}88` : 'none',
+                      boxShadow: isSelected && lightsOn ? `0 0 12px ${mood.swatch}88` : 'none',
+                      opacity: lightsOn ? 1 : 0.45,
                     }}
                   >
                     <div
@@ -221,9 +278,9 @@ export default function VolumetricAtelierStudio() {
                         height: '9px',
                         borderRadius: '50%',
                         backgroundColor: mood.swatch,
-                        boxShadow: isSelected ? `0 0 8px ${mood.swatch}` : 'none',
+                        boxShadow: isSelected && lightsOn ? `0 0 8px ${mood.swatch}` : 'none',
                         transition: 'transform 200ms ease',
-                        transform: isSelected ? 'scale(1.25)' : 'scale(1)',
+                        transform: isSelected && lightsOn ? 'scale(1.25)' : 'scale(1)',
                       }}
                     />
                   </button>
@@ -235,7 +292,7 @@ export default function VolumetricAtelierStudio() {
                   width: '14px',
                   height: '1px',
                   backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  margin: '4px 0',
+                  margin: '2px 0',
                 }}
               />
 
@@ -249,8 +306,8 @@ export default function VolumetricAtelierStudio() {
                   borderRadius: '50%',
                   cursor: 'pointer',
                   border: 'none',
-                  backgroundColor: isFollowMode ? '#c5a880' : 'rgba(255, 255, 255, 0.08)',
-                  color: isFollowMode ? '#000000' : 'rgba(255, 255, 255, 0.65)',
+                  backgroundColor: isFollowMode && lightsOn ? '#c5a880' : 'rgba(255, 255, 255, 0.08)',
+                  color: isFollowMode && lightsOn ? '#000000' : 'rgba(255, 255, 255, 0.65)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -267,13 +324,14 @@ export default function VolumetricAtelierStudio() {
                 fontSize: '9px',
                 fontFamily: 'monospace',
                 letterSpacing: '0.15em',
-                color: 'rgba(255, 255, 255, 0.4)',
+                color: lightsOn ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.18)',
                 writingMode: 'vertical-rl',
                 textOrientation: 'mixed',
                 textTransform: 'uppercase',
+                transition: 'color 300ms ease',
               }}
             >
-              {activeMood.temp}
+              {lightsOn ? activeMood.temp : 'OFF'}
             </span>
           </div>
 
@@ -293,8 +351,9 @@ export default function VolumetricAtelierStudio() {
             <div
               style={{
                 position: 'relative',
-                width: 'min(90vw, 440px)',
-                height: 'min(66vh, 620px)',
+                width: 'min(75vw, 330px)',
+                height: 'min(48vh, 440px)',
+                marginBottom: '10px',
                 display: 'flex',
                 alignItems: 'flex-end',
                 justifyContent: 'center',
@@ -389,14 +448,14 @@ export default function VolumetricAtelierStudio() {
               </span>
             </div>
 
-            {/* Symmetrical Numeric Capsule & Appointment CTA */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '2px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {/* Symmetrical Numeric Capsule Center Aligned */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '6px' }}>
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  background: 'rgba(6, 9, 15, 0.82)',
+                  background: 'rgba(6, 9, 15, 0.85)',
                   backdropFilter: 'blur(16px)',
                   WebkitBackdropFilter: 'blur(16px)',
                   border: '1px solid rgba(255, 255, 255, 0.12)',
@@ -413,7 +472,7 @@ export default function VolumetricAtelierStudio() {
                       onClick={() => setActiveLookIndex(index)}
                       title={look.name}
                       style={{
-                        padding: '4px 11px',
+                        padding: '5px 12px',
                         borderRadius: '9999px',
                         fontSize: '11px',
                         fontFamily: 'monospace',
@@ -431,31 +490,6 @@ export default function VolumetricAtelierStudio() {
                   );
                 })}
               </div>
-
-              <a
-                href={`https://wa.me/919062512323?text=${encodeURIComponent(
-                  `Khamma Ghani. I am inquiring about a private atelier fitting for ${activeLook.name} at Tharo Menswear Allenby Road Atelier.`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  fontSize: '11px',
-                  fontFamily: 'monospace',
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: '#c5a880',
-                  textDecoration: 'none',
-                  borderBottom: '1px solid rgba(197, 168, 128, 0.4)',
-                  paddingBottom: '2px',
-                  transition: 'color 200ms ease, border-color 200ms ease',
-                }}
-              >
-                <span>Reserve Studio Fitting</span>
-                <ArrowUpRight size={11} />
-              </a>
             </div>
           </div>
         </div>
